@@ -1,0 +1,32 @@
+{
+	"schemaVersion": 1,
+	"id": "minecraft-prehistoria",
+	"version": "${version}",
+	"name": "Minecraft Prehistoria",
+	"description": "A Fabric mod-jam project about underground prehistoric jungles, archaeology, fossils, and ancient creatures.",
+	"authors": [
+		"Turnute",
+		"Minecraft Prehistoria Team"
+	],
+	"contact": {},
+	"license": "CC0-1.0",
+	"icon": "assets/minecraft-prehistoria/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"turnute.mcprehistoria.MinecraftPrehistoria"
+		],
+		"client": [
+			"turnute.mcprehistoria.client.MinecraftPrehistoriaClient"
+		],
+		"fabric-datagen": [
+			"turnute.mcprehistoria.client.MinecraftPrehistoriaDataGenerator"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.1.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
