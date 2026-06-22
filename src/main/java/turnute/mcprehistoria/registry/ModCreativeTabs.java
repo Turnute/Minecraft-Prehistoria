@@ -27,6 +27,7 @@ public final class ModCreativeTabs {
                 // !!! ADD BLOCK & ITEMS HERE !!!
 
                 output.accept(ModBlocks.EXCAVATION_TABLE);
+                output.accept(ModItems.GIANT_SQUID_SPAWN_EGG);
 
                 // !!! ADD BLOCK & ITEMS HERE !!!
                 // ========================

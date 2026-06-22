@@ -20,9 +20,9 @@ public class MinecraftPrehistoria implements ModInitializer {
 		LOGGER.info("Initializing {}", MOD_NAME);
 
 		// Keep this order boring and predictable. During a mod-jam, boring is good.
-		ModItems.register();
-		ModBlocks.register();
 		ModEntities.register();
+		ModBlocks.register();
+		ModItems.register();		// AFTER MODENTITIES!
 		ModVillagers.register();
 		ModArchaeology.register();
 		ModLoot.register();

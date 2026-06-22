@@ -15,6 +15,8 @@ public class ExcavationDescriptions {
 
     public static void register() {
         DESCRIPTIONS.put(ModBlocks.EXCAVATION_TABLE.asItem(), Component.literal("Excavation Table: Used for examining Minecraft Prehistorica mod items and blocks."));
+        DESCRIPTIONS.put(ModItems.GIANT_SQUID_SPAWN_EGG, Component.literal("Giant Squid Spawn Egg: TODO"));
+
     }
 
     public static Component getDescription(final Item item) {
