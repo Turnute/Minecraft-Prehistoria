@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import turnute.mcprehistoria.archaeology.ExcavationDescriptions;
 import turnute.mcprehistoria.archaeology.ModArchaeology;
+import turnute.mcprehistoria.entity.ModEntitySpawns;
 import turnute.mcprehistoria.registry.*;
 import turnute.mcprehistoria.village.ModVillagers;
 import turnute.mcprehistoria.world.ModWorldgen;
@@ -21,6 +22,7 @@ public class MinecraftPrehistoria implements ModInitializer {
 
 		// Keep this order boring and predictable. During a mod-jam, boring is good.
 		ModEntities.register();
+		ModEntitySpawns.register();
 		ModBlocks.register();
 		ModItems.register();		// AFTER MODENTITIES!
 		ModVillagers.register();

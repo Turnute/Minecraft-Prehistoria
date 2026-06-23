@@ -39,6 +39,12 @@ public class GiantSquidRenderer extends SquidRenderer<GiantSquidEntity> {
 
         if (state instanceof GiantSquidRenderState giantState) {
             float size = giantState.sizeMultiplier;
+
+            // Offset model
+            double xOffset = 0.2D * size;
+            double yOffset = 0.75D * (size - 1.0D);
+            poseStack.translate(xOffset, yOffset, 0.0D);
+
             poseStack.scale(size, size, size);
         }
     }
