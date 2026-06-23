@@ -18,6 +18,10 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.phys.Vec3;
 
 public class GiantSquidEntity extends Squid {
     private static final float MIN_SIZE_MULTIPLIER = 4.0f;
@@ -28,9 +32,32 @@ public class GiantSquidEntity extends Squid {
     private static final String SIZE_MULTIPLIER_KEY = "SizeMultiplier";
     private static final String SIZE_INITIALIZED_KEY = "SizeInitialized";
 
-    public static final int SPAWN_WEIGHT = 2;
+    private static final int SPAWN_CLEARANCE_RADIUS = 5;
+    private static final int SPAWN_CLEARANCE_UP = 7;
+    private static final int SPAWN_CLEARANCE_DOWN = 3;
+
+    public static final boolean DEBUG_NATURAL_SPAWNS = true;
+
+    public static final int SPAWN_WEIGHT = DEBUG_NATURAL_SPAWNS ? 25 : 4; // rareté spawn
     public static final int SPAWN_MIN_GROUP = 1;
     public static final int SPAWN_MAX_GROUP = 1;
+
+    private static final double MAX_WATER_SPEED = 0.085D;
+    private static final double STUCK_IMPULSE_STRENGTH = 0.035D;
+    private static final int STUCK_IMPULSE_INTERVAL = 40;
+
+    private static final float PITCH_MULTIPLIER = 0.45F;                // plus bas = plus grave
+    private static final float BASE_GIANT_SOUND_VOLUME = 1.35F;
+    private static final float SIZE_SOUND_VOLUME_BONUS = 0.12F;
+
+    private static final int EXTRA_INK_CLOUDS = 50;                      // plus haut = + paquets encre
+    private static final int EXTRA_INK_PARTICLES_PER_CLOUD = 80;
+    private static final double EXTRA_INK_SPEED = 0.08D;
+
+    private static final int BASE_NAUTILUS_COUNT = 30;
+    private static final int ADDITIONAL_NAUTILUS_COUNT = 30;
+    private static final int BASE_BABY_COUNT = 20;
+    private static final int ADDITIONAL_BABY_COUNT = 30;
 
     private static final EntityDataAccessor<Float> DATA_SIZE_MULTIPLIER = SynchedEntityData.defineId(
             GiantSquidEntity.class,
@@ -53,7 +80,7 @@ public class GiantSquidEntity extends Squid {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(DATA_SIZE_MULTIPLIER, 1.0f);
+        builder.define(DATA_SIZE_MULTIPLIER, MIN_SIZE_MULTIPLIER);
         builder.define(DATA_SIZE_INITIALIZED, false);
     }
 
@@ -150,8 +177,147 @@ public class GiantSquidEntity extends Squid {
 
     @Override
     protected float getSoundVolume() {
-        return 0.6F;
+        return BASE_GIANT_SOUND_VOLUME + this.getSizeMultiplier() * SIZE_SOUND_VOLUME_BONUS;
     }
+
+    @Override
+    public float getVoicePitch() {
+        return super.getVoicePitch() * PITCH_MULTIPLIER;
+    }
+
+    @Override
+    public void aiStep() {
+        super.aiStep();
+
+        if (!this.level().isClientSide()) {
+            nudgeIfBarelyMoving();
+        }
+
+        updateVisualAnimation();
+    }
+
+    private void nudgeIfBarelyMoving() {
+        if (!this.isInWater()) {
+            return;
+        }
+
+        if (this.tickCount % STUCK_IMPULSE_INTERVAL != 0) {
+            return;
+        }
+
+        Vec3 velocity = this.getDeltaMovement();
+
+        if (velocity.horizontalDistanceSqr() > 0.0004D) {
+            return;
+        }
+
+        Vec3 impulse = new Vec3(
+                this.random.nextDouble() - 0.5D,
+                (this.random.nextDouble() - 0.5D) * 0.35D,
+                this.random.nextDouble() - 0.5D
+        );
+
+        if (impulse.lengthSqr() > 1.0E-7D) {
+            this.setDeltaMovement(
+                    this.getDeltaMovement().add(impulse.normalize().scale(STUCK_IMPULSE_STRENGTH))
+            );
+        }
+    }
+
+    private static final float VISUAL_ANIMATION_LERP = 0.10F;
+
+    private boolean visualAnimationInitialized = false;
+    private float visualTentacleAngle;
+    private float visualXBodyRot;
+    private float visualZBodyRot;
+
+    private void updateVisualAnimation() {
+        if (!visualAnimationInitialized) {
+            visualTentacleAngle = this.tentacleAngle;
+            visualXBodyRot = this.xBodyRot;
+            visualZBodyRot = this.zBodyRot;
+            visualAnimationInitialized = true;
+            return;
+        }
+
+        visualTentacleAngle = Mth.lerp(VISUAL_ANIMATION_LERP, visualTentacleAngle, this.tentacleAngle);
+        visualXBodyRot = Mth.lerp(VISUAL_ANIMATION_LERP, visualXBodyRot, this.xBodyRot);
+        visualZBodyRot = Mth.lerp(VISUAL_ANIMATION_LERP, visualZBodyRot, this.zBodyRot);
+    }
+
+    public float getVisualTentacleAngle() {
+        return visualTentacleAngle;
+    }
+
+    public float getVisualXBodyRot() {
+        return visualXBodyRot;
+    }
+
+    public float getVisualZBodyRot() {
+        return visualZBodyRot;
+    }
+
+    @Override
+    public void travel(Vec3 movementInput) {
+        super.travel(movementInput);
+
+        if (this.isInWater()) {
+            Vec3 velocity = this.getDeltaMovement();
+
+            if (velocity.lengthSqr() > MAX_WATER_SPEED * MAX_WATER_SPEED) {
+                this.setDeltaMovement(velocity.normalize().scale(MAX_WATER_SPEED));
+            }
+        }
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
+        boolean hurt = super.hurtServer(level, damageSource, amount);
+
+        if (hurt && damageSource.getEntity() instanceof LivingEntity) {
+            this.spawnExtraInk(level);
+        }
+
+        return hurt;
+    }
+
+    private void spawnExtraInk(ServerLevel level) {
+        ParticleOptions inkParticle = this.getInkParticle();
+        RandomSource random = this.getRandom();
+
+        float sizeFactor = Mth.clamp(this.getSizeMultiplier() / 6.0F, 1.0F, 2.2F);
+
+        int cloudCount = Math.round(EXTRA_INK_CLOUDS * sizeFactor);
+        int particlesPerCloud = Math.round(EXTRA_INK_PARTICLES_PER_CLOUD * sizeFactor);
+
+        double width = this.getBbWidth();
+        double height = this.getBbHeight();
+
+        for (int i = 0; i < cloudCount; i++) {
+            double x = this.getX() + (random.nextDouble() - 0.5D) * width * 0.9D;
+            double y = this.getY() + height * (0.25D + random.nextDouble() * 0.55D);
+            double z = this.getZ() + (random.nextDouble() - 0.5D) * width * 0.9D;
+
+            double spreadX = width * 0.35D;
+            double spreadY = height * 0.18D;
+            double spreadZ = width * 0.35D;
+
+            level.sendParticles(
+                    inkParticle,
+                    x,
+                    y,
+                    z,
+                    particlesPerCloud,
+                    spreadX,
+                    spreadY,
+                    spreadZ,
+                    EXTRA_INK_SPEED
+            );
+        }
+    }
+
+    // =============
+    // SPAWNING
 
     public static boolean canSpawn(
             EntityType<GiantSquidEntity> type,
@@ -173,10 +339,40 @@ public class GiantSquidEntity extends Squid {
                 pos.getZ()
         );
 
-        boolean actuallyDeepOcean = seaLevel - oceanFloorY >= 30;
-        boolean notNearSurface = pos.getY() <= seaLevel - 10;
+        int requiredDepth = DEBUG_NATURAL_SPAWNS ? 18 : 30;
+        int requiredSurfaceDistance = DEBUG_NATURAL_SPAWNS ? 5 : 10;
 
-        return actuallyDeepOcean && notNearSurface;
+        boolean actuallyDeepOcean = seaLevel - oceanFloorY >= requiredDepth;
+        boolean notNearSurface = pos.getY() <= seaLevel - requiredSurfaceDistance;
+        boolean notScrapingFloor = pos.getY() >= oceanFloorY + SPAWN_CLEARANCE_DOWN + 1;
+
+        return actuallyDeepOcean && notNearSurface && notScrapingFloor && hasWaterClearance(level, pos);
+    }
+
+    private static boolean hasWaterClearance(ServerLevelAccessor level, BlockPos center) {
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
+
+        for (int x = -SPAWN_CLEARANCE_RADIUS; x <= SPAWN_CLEARANCE_RADIUS; x++) {
+            for (int z = -SPAWN_CLEARANCE_RADIUS; z <= SPAWN_CLEARANCE_RADIUS; z++) {
+                if (x * x + z * z > SPAWN_CLEARANCE_RADIUS * SPAWN_CLEARANCE_RADIUS) {
+                    continue;
+                }
+
+                for (int y = -SPAWN_CLEARANCE_DOWN; y <= SPAWN_CLEARANCE_UP; y++) {
+                    mutable.set(center.getX() + x, center.getY() + y, center.getZ() + z);
+
+                    if (!level.getFluidState(mutable).is(FluidTags.WATER)) {
+                        return false;
+                    }
+
+                    if (!level.getBlockState(mutable).getCollisionShape(level, mutable).isEmpty()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override
@@ -188,9 +384,15 @@ public class GiantSquidEntity extends Squid {
     ) {
         SpawnGroupData data = super.finalizeSpawn(level, difficulty, spawnReason, spawnGroupData);
 
+        if (!this.isSizeInitialized()) {
+            this.initializeRandomSize();
+        }
+
         if(spawnReason == EntitySpawnReason.NATURAL || spawnReason == EntitySpawnReason.CHUNK_GENERATION) {
             spawnCompanions(level);
         }
+
+        this.setPersistenceRequired();
 
         return data;
     }
@@ -198,8 +400,8 @@ public class GiantSquidEntity extends Squid {
     private void spawnCompanions(ServerLevelAccessor level) {
         RandomSource random = this.getRandom();
 
-        int nautilusCount = 10 + random.nextInt(15);
-        int babySquidCount = 8 + random.nextInt(8);
+        int nautilusCount = BASE_NAUTILUS_COUNT + random.nextInt(ADDITIONAL_NAUTILUS_COUNT);
+        int babySquidCount = BASE_BABY_COUNT + random.nextInt(ADDITIONAL_BABY_COUNT);
 
         for (int i = 0; i < nautilusCount; i++) {
             spawnAround(level, EntityType.NAUTILUS, false);
@@ -240,5 +442,10 @@ public class GiantSquidEntity extends Squid {
 
             return;
         }
+    }
+
+    @Override
+    public boolean removeWhenFarAway(double distanceSquared) {
+        return false;
     }
 }

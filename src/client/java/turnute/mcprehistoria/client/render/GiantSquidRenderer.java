@@ -28,6 +28,10 @@ public class GiantSquidRenderer extends SquidRenderer<GiantSquidEntity> {
     public void extractRenderState(GiantSquidEntity entity, SquidRenderState state, float tickProgress) {
         super.extractRenderState(entity, state, tickProgress);
 
+        state.tentacleAngle = entity.getVisualTentacleAngle();
+        state.xBodyRot = entity.getVisualXBodyRot();
+        state.zBodyRot = entity.getVisualZBodyRot();
+
         if (state instanceof GiantSquidRenderState giantState) {
             giantState.sizeMultiplier = entity.getSizeMultiplier();
         }
