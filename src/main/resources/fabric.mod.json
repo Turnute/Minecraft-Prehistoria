@@ -21,12 +21,16 @@
 		],
 		"fabric-datagen": [
 			"turnute.mcprehistoria.client.MinecraftPrehistoriaDataGenerator"
+		],
+		"terrablender": [
+			"turnute.mcprehistoria.MinecraftPrehistoria"
 		]
 	},
 	"depends": {
 		"fabricloader": ">=0.19.3",
 		"minecraft": "~26.1.2",
 		"java": ">=25",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"terrablender": "*"
 	}
 }

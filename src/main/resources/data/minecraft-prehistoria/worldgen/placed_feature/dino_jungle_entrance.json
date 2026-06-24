@@ -1,0 +1,21 @@
+{
+  "feature": "minecraft-prehistoria:dino_jungle_entrance",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 180
+    },
+    {
+      "type": "minecraft:height_range",
+      "height": {
+        "type": "minecraft:uniform",
+        "min_inclusive": {
+          "absolute": 0
+        },
+        "max_inclusive": {
+          "absolute": 0
+        }
+      }
+    }
+  ]
+}
