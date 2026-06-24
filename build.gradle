@@ -13,6 +13,16 @@ repositories {
 		name = "CurseMaven"
 		url = "https://www.cursemaven.com"
 	}
+
+	exclusiveContent {
+		forRepository {
+			maven {
+				name = 'GeckoLib'
+				url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+			}
+		}
+		filter { includeGroupAndSubgroups('com.geckolib') }
+	}
 }
 
 loom {
@@ -43,6 +53,8 @@ dependencies {
 	// Custom overworld biome injection. Coordinates use CurseMaven:
 	// curse.maven:<descriptor>-<projectid>:<fileid>
 	implementation "curse.maven:terrablender-fabric-565956:${project.terrablender_curse_file_id}"
+
+	implementation "com.geckolib:geckolib-fabric-${project.minecraft_version}:${project.geckolib_version}"
 }
 
 processResources {

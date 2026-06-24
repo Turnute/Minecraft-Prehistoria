@@ -5,5 +5,7 @@
   "entity.minecraft-prehistoria.giant_squid": "Giant Squid",
   "item.minecraft-prehistoria.giant_squid_spawn_egg": "Giant Squid Spawn Egg",
   "villager.minecraft-prehistoria.archaeologist": "Archaeologist",
-  "item.minecraft-prehistoria.dino_jungle_map": "Dino Dino Jungle Map"
+  "item.minecraft-prehistoria.dino_jungle_map": "Dino Dino Jungle Map",
+  "entity.minecraft-prehistoria.megameli": "Megameli",
+  "item.minecraft-prehistoria.megameli_spawn_egg": "Megameli Spawn Egg"
 }

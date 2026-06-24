@@ -1,5 +1,6 @@
 package turnute.mcprehistoria.client;
 
+import com.geckolib.renderer.GeoEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import turnute.mcprehistoria.client.render.GiantSquidRenderer;
@@ -10,5 +11,6 @@ public class MinecraftPrehistoriaClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		EntityRenderers.register(ModEntities.GIANT_SQUID, GiantSquidRenderer::new);
+		EntityRenderers.register(ModEntities.MEGAMELI, context -> new GeoEntityRenderer<>(context, ModEntities.MEGAMELI));
 	}
 }

@@ -10,6 +10,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import turnute.mcprehistoria.MinecraftPrehistoria;
 import turnute.mcprehistoria.entity.aquatic.GiantSquidEntity;
+import turnute.mcprehistoria.entity.insect.MegameliEntity;
 /**
  * Register all EntityType objects here.
  *
@@ -27,6 +28,13 @@ public final class ModEntities {
 			EntityType.Builder.of(GiantSquidEntity::new, MobCategory.WATER_CREATURE)
 					.sized(0.8f, 0.8f)
 					.clientTrackingRange(20)
+	);
+
+	public static final EntityType<MegameliEntity> MEGAMELI = register(
+			"megameli",
+			EntityType.Builder.of(MegameliEntity::new, MobCategory.CREATURE)
+					.sized(1.4f, 1.0f)
+					.clientTrackingRange(10)
 	);
 
 	private static <T extends Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {
@@ -51,6 +59,11 @@ public final class ModEntities {
 		FabricDefaultAttributeRegistry.register(
 				GIANT_SQUID,
 				GiantSquidEntity.createAttributes()
+		);
+
+		FabricDefaultAttributeRegistry.register(
+				MEGAMELI,
+				MegameliEntity.createAttributes()
 		);
 	}
 }

@@ -2,8 +2,10 @@
   "itemGroup.minecraft-prehistoria.main": "Minecraft Prehistoria",
   "itemGroup.minecraft-prehistoria.prehistoria": "Minecraft Prehistoria",
   "block.minecraft-prehistoria.excavation_table": "Table de fouille",
-  "entity.minecraft-prehistoria.giant_squid": "Calmar géant",
-  "item.minecraft-prehistoria.giant_squid_spawn_egg": "Œuf d'apparition de calmar géant",
+  "entity.minecraft-prehistoria.giant_squid": "Calmar Géant",
+  "item.minecraft-prehistoria.giant_squid_spawn_egg": "Œuf d'apparition de Calmar Géant",
   "villager.minecraft-prehistoria.archaeologist": "Archéologue",
-  "item.minecraft-prehistoria.dino_jungle_map": "Carte de la Dino Dino Jungle"
+  "item.minecraft-prehistoria.dino_jungle_map": "Carte de Jungle Dino Dino",
+  "entity.minecraft-prehistoria.megameli": "Megameli",
+  "item.minecraft-prehistoria.megameli_spawn_egg": "Œuf d'apparition de Megameli"
 }

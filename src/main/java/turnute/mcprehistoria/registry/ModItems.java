@@ -27,6 +27,12 @@ public final class ModItems {
 			new Item.Properties().spawnEgg(ModEntities.GIANT_SQUID)
 	);
 
+	public static final Item MEGAMELI_SPAWN_EGG = register(
+			"megameli_spawn_egg",
+			SpawnEggItem::new,
+			new Item.Properties().spawnEgg(ModEntities.MEGAMELI)
+	);
+
 	private static Item register(String name, Function<Item.Properties, Item> itemFactory, Item.Properties properties) {
 		ResourceKey<Item> itemKey = ResourceKey.create(
 				Registries.ITEM,
