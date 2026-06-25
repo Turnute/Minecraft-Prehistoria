@@ -42,9 +42,13 @@ public class GiantSquidEntity extends Squid {
     public static final int SPAWN_MIN_GROUP = 1;
     public static final int SPAWN_MAX_GROUP = 1;
 
-    private static final double MAX_WATER_SPEED = 0.085D;
-    private static final double STUCK_IMPULSE_STRENGTH = 0.035D;
-    private static final int STUCK_IMPULSE_INTERVAL = 40;
+    private static final double MAX_WATER_SPEED = 0.285D;
+
+    private static final double STUCK_FORWARD_IMPULSE_STRENGTH = 0.01D;
+    private static final int STUCK_IMPULSE_INTERVAL = 80;
+    private static final int SPAWN_SWIM_START_TICKS = 20;
+
+    private boolean initialSwimDirectionSet = false;
 
     private static final float PITCH_MULTIPLIER = 0.45F;                // plus bas = plus grave
     private static final float BASE_GIANT_SOUND_VOLUME = 1.35F;
@@ -190,14 +194,48 @@ public class GiantSquidEntity extends Squid {
         super.aiStep();
 
         if (!this.level().isClientSide()) {
+            initializeSwimDirectionAfterSpawn();
             nudgeIfBarelyMoving();
         }
 
         updateVisualAnimation();
     }
 
+    private void initializeSwimDirectionAfterSpawn() {
+        if (this.initialSwimDirectionSet) {
+            return;
+        }
+
+        if (!this.isInWater()) {
+            return;
+        }
+
+        if (this.tickCount < SPAWN_SWIM_START_TICKS) {
+            return;
+        }
+
+        this.initialSwimDirectionSet = true;
+
+        float yaw = this.random.nextFloat() * 360.0F;
+
+        this.setYRot(yaw);
+        this.yRotO = yaw;
+
+        Vec3 forward = Vec3.directionFromRotation(0.0F, yaw).scale(MAX_WATER_SPEED * 0.55D);
+
+        this.setDeltaMovement(
+                forward.x,
+                (this.random.nextDouble() - 0.5D) * 0.015D,
+                forward.z
+        );
+    }
+
     private void nudgeIfBarelyMoving() {
         if (!this.isInWater()) {
+            return;
+        }
+
+        if (this.tickCount < SPAWN_SWIM_START_TICKS + STUCK_IMPULSE_INTERVAL) {
             return;
         }
 
@@ -211,17 +249,28 @@ public class GiantSquidEntity extends Squid {
             return;
         }
 
-        Vec3 impulse = new Vec3(
-                this.random.nextDouble() - 0.5D,
-                (this.random.nextDouble() - 0.5D) * 0.35D,
-                this.random.nextDouble() - 0.5D
+        Vec3 forward = Vec3.directionFromRotation(0.0F, this.getYRot());
+
+        if (forward.horizontalDistanceSqr() <= 1.0E-7D) {
+            float fallbackYaw = this.random.nextFloat() * 360.0F;
+            this.setYRot(fallbackYaw);
+            this.yRotO = fallbackYaw;
+            forward = Vec3.directionFromRotation(0.0F, fallbackYaw);
+        }
+
+        Vec3 impulse = forward.normalize().scale(STUCK_FORWARD_IMPULSE_STRENGTH);
+
+        double verticalDrift = Mth.clamp(
+                velocity.y * 0.35D + (this.random.nextDouble() - 0.5D) * 0.01D,
+                -0.015D,
+                0.015D
         );
 
-        if (impulse.lengthSqr() > 1.0E-7D) {
-            this.setDeltaMovement(
-                    this.getDeltaMovement().add(impulse.normalize().scale(STUCK_IMPULSE_STRENGTH))
-            );
-        }
+        this.setDeltaMovement(
+                velocity.x + impulse.x,
+                verticalDrift,
+                velocity.z + impulse.z
+        );
     }
 
     private static final float VISUAL_ANIMATION_LERP = 0.10F;
