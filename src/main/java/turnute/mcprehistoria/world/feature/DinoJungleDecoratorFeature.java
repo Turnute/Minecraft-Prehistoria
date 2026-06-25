@@ -6,7 +6,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
@@ -142,7 +141,6 @@ public class DinoJungleDecoratorFeature extends Feature<NoneFeatureConfiguration
                 : Blocks.SHROOMLIGHT.defaultBlockState();
 
         level.setBlock(ceilingPos, glow, 2);
-        level.setBlock(lightPos, Blocks.LIGHT.defaultBlockState().setValue(LightBlock.LEVEL, 15), 2);
     }
 
     private static void placeWallOrFloorLight(WorldGenLevel level, int x, int z, int floorY, int roofY) {
@@ -157,7 +155,7 @@ public class DinoJungleDecoratorFeature extends Feature<NoneFeatureConfiguration
             return;
         }
 
-        level.setBlock(pos, Blocks.LIGHT.defaultBlockState().setValue(LightBlock.LEVEL, 13), 2);
+        level.setBlock(pos, Blocks.SEA_LANTERN.defaultBlockState(), 2);
     }
 
     private static void placePlants(WorldGenLevel level, RandomSource random, int x, int z, int floorY) {

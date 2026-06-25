@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -141,7 +140,7 @@ public class DinoJungleEntranceFeature extends Feature<NoneFeatureConfiguration>
 
         BlockPos lightPos = new BlockPos(centerX, waterY + 1, centerZ);
         if (!level.isOutsideBuildHeight(lightPos)) {
-            level.setBlock(lightPos, Blocks.LIGHT.defaultBlockState().setValue(LightBlock.LEVEL, 15), 2);
+            level.setBlock(lightPos, Blocks.SEA_LANTERN.defaultBlockState(), 2);
         }
     }
 

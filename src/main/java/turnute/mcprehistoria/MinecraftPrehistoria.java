@@ -4,7 +4,6 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import terrablender.api.Regions;
 import terrablender.api.TerraBlenderApi;
 import turnute.mcprehistoria.archaeology.ExcavationDescriptions;
 import turnute.mcprehistoria.archaeology.ModArchaeology;
@@ -12,7 +11,6 @@ import turnute.mcprehistoria.entity.ModEntitySpawns;
 import turnute.mcprehistoria.registry.*;
 import turnute.mcprehistoria.village.ModVillagers;
 import turnute.mcprehistoria.world.ModWorldgen;
-import turnute.mcprehistoria.world.biome.PrehistoriaOverworldRegion;
 
 public class MinecraftPrehistoria implements ModInitializer, TerraBlenderApi {
     public static final String MOD_ID = "minecraft-prehistoria";
@@ -38,9 +36,10 @@ public class MinecraftPrehistoria implements ModInitializer, TerraBlenderApi {
 
     @Override
     public void onTerraBlenderInitialized() {
-        LOGGER.info("Registering TerraBlender regions for {}", MOD_NAME);
-
-        Regions.register(new PrehistoriaOverworldRegion(id("overworld_dino_jungle"), 6));
+        // Dino Jungle is intentionally generated as a Structure now.
+        // TerraBlender is left available for later biome work, but the V1 climate
+        // injection is disabled so dino_jungle cannot appear as a random surface slice.
+        LOGGER.info("Dino Jungle TerraBlender climate injection disabled for {}", MOD_NAME);
     }
 
     public static Identifier id(String path) {

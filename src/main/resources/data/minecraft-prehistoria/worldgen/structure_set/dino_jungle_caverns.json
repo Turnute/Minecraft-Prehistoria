@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 68261437,
+    "separation": 80,
+    "spacing": 112
+  },
+  "structures": [
+    {
+      "structure": "minecraft-prehistoria:dino_jungle_cavern",
+      "weight": 1
+    }
+  ]
+}
