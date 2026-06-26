@@ -5,6 +5,9 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
@@ -22,6 +25,8 @@ import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
+import turnute.mcprehistoria.entity.insect.MegameliEntity;
+import turnute.mcprehistoria.registry.ModEntities;
 import turnute.mcprehistoria.world.biome.ModBiomes;
 
 public class DinoJungleCavernPiece extends StructurePiece {
@@ -113,6 +118,91 @@ public class DinoJungleCavernPiece extends StructurePiece {
         buildEntranceLake(level, chunkBounds);
         buildSingleShaft(level, chunkBounds);
         decorateCavern(level, chunkBounds);
+        spawnInitialCavernMobs(level, chunkBounds);
+    }
+
+    private void spawnInitialCavernMobs(WorldGenLevel level, BoundingBox chunkBounds) {
+        int minX = Math.max(this.boundingBox.minX(), chunkBounds.minX());
+        int maxX = Math.min(this.boundingBox.maxX(), chunkBounds.maxX());
+        int minZ = Math.max(this.boundingBox.minZ(), chunkBounds.minZ());
+        int maxZ = Math.min(this.boundingBox.maxZ(), chunkBounds.maxZ());
+
+        for(int x = minX; x <= maxX; x++) {
+            for(int z = minZ; z <= maxZ; z++) {
+                if(horizontalDistance(x, z) > 0.76D || isLakeColumn(x, z) || isShaftColumn(x, z)) {
+                    continue;
+                }
+
+                int floorY = floorY(x, z);
+                BlockPos groundPos = new BlockPos(x, floorY, z);
+                BlockPos spawnPos = groundPos.above();
+
+                if(!isCreatureSpawnFloor(level.getBlockState(groundPos))) {
+                    continue;
+                }
+
+                if(hashRange(x, floorY, z, 900, 1100) == 0) {
+                    spawnCavernMob(level, chunkBounds, spawnPos, EntityType.SNIFFER, 901);
+                }
+
+                if(hashRange(x, floorY, z, 902, 1800) == 0) {
+                    spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.MEGAMELI, 903);
+                }
+            }
+        }
+    }
+
+    private boolean isCreatureSpawnFloor(BlockState state) {
+        return state.is(Blocks.GRASS_BLOCK)
+                || state.is(Blocks.MOSS_BLOCK)
+                || state.is(Blocks.MUD)
+                || state.is(Blocks.ROOTED_DIRT)
+                || state.is(Blocks.COARSE_DIRT)
+                || state.is(Blocks.DIRT)
+                || state.is(Blocks.PODZOL);
+    }
+
+    private <T extends Mob> void spawnCavernMob(
+            WorldGenLevel level,
+            BoundingBox chunkBounds,
+            BlockPos pos,
+            EntityType<T> entityType,
+            int salt
+    ) {
+        if(!chunkBounds.isInside(pos)
+            || level.isOutsideBuildHeight(pos)
+            || !level.getBlockState(pos).isAir()
+            || !level.getBlockState(pos.above()).isAir()
+            || !level.getFluidState(pos).isEmpty()
+        ) { return; }
+
+        T mob = entityType.create(level.getLevel(), EntitySpawnReason.CHUNK_GENERATION);
+
+        if (mob == null) {
+            return;
+        }
+
+        float yaw = hashRange(pos.getX(), pos.getY(), pos.getZ(), salt, 360);
+
+        mob.setPos(
+                pos.getX() + 0.5D,
+                pos.getY(),
+                pos.getZ() + 0.5D
+        );
+
+        mob.setYRot(yaw);
+        mob.setXRot(0.0F);
+        mob.yBodyRot = yaw;
+        mob.yHeadRot = yaw;
+
+        mob.finalizeSpawn(
+                level,
+                level.getCurrentDifficultyAt(pos),
+                EntitySpawnReason.CHUNK_GENERATION,
+                null
+        );
+
+        level.addFreshEntity(mob);
     }
 
     /**

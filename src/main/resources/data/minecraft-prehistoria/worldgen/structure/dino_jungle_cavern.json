@@ -18,6 +18,10 @@
           "weight": 2
         }
       ]
+    },
+    "monster":{
+      "bounding_box": "piece",
+      "spawns": []
     }
   },
   "step": "top_layer_modification",

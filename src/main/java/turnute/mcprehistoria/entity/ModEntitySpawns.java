@@ -88,7 +88,7 @@ public class ModEntitySpawns {
             net.minecraft.util.RandomSource random
     ) {
         return isDinoJungle(level, pos)
-                && isDinoFloor(level.getBlockState(pos.below()))
+                //&& isDinoFloor(level.getBlockState(pos.below()))
                 && level.getBlockState(pos).isAir()
                 && level.getFluidState(pos).isEmpty()
                 && random.nextInt(5) == 0;
@@ -102,7 +102,7 @@ public class ModEntitySpawns {
             net.minecraft.util.RandomSource random
     ) {
         return isDinoJungle(level, pos)
-                && isDinoFloor(level.getBlockState(pos.below()))
+                //&& isDinoFloor(level.getBlockState(pos.below()))
                 && level.getBlockState(pos).isAir()
                 && level.getBlockState(pos.above()).isAir()
                 && level.getFluidState(pos).isEmpty()
