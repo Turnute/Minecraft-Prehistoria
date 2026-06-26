@@ -15,7 +15,7 @@
 * `registry/` : items, blocks, entities, loot hooks.
 * `village/` : archéologue, trades, POI.
 * `archaeology/` : logique de table de fouille et descriptions.
-* `world/` : génération de la Jungle Dino Dino et règles de spawn.
-* `entity/dino/` : mobs de la jungle.
+* `world/` : structure de la Jungle Dino Dino, biome interne et worldgen.
+* `entity/insect/` : Megameli et futurs insectes préhistoriques.
 * `entity/aquatic/` : calmar géant et logique liée aux océans.
 * `docs/` : roadmap, conventions, tâches simples.

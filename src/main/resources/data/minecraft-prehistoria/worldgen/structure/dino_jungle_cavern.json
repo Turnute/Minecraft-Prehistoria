@@ -1,7 +1,25 @@
 {
   "type": "minecraft-prehistoria:dino_jungle_cavern",
   "biomes": "#minecraft:is_overworld",
-  "spawn_overrides": {},
+  "spawn_overrides": {
+    "creature": {
+      "bounding_box": "piece",
+      "spawns": [
+        {
+          "type": "minecraft:sniffer",
+          "maxCount": 2,
+          "minCount": 1,
+          "weight": 8
+        },
+        {
+          "type": "minecraft-prehistoria:megameli",
+          "maxCount": 1,
+          "minCount": 1,
+          "weight": 2
+        }
+      ]
+    }
+  },
   "step": "top_layer_modification",
   "terrain_adaptation": "none"
 }

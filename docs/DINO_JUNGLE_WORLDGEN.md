@@ -1,62 +1,39 @@
-# Dino Jungle worldgen notes
+# Dino Dino Jungle worldgen notes
 
-This version turns the prototype underground jungle pocket into a real biome-driven setup.
+The Dino Dino Jungle is now generated as a custom **Structure**, not as old chunk-local biome features.
 
-## What is in place
+## Active files
 
+- `data/minecraft-prehistoria/worldgen/structure/dino_jungle_cavern.json`
+  - Declares the cavern structure and its local spawn overrides.
+- `data/minecraft-prehistoria/worldgen/structure_set/dino_jungle_caverns.json`
+  - Controls how often caverns appear in the overworld.
 - `data/minecraft-prehistoria/worldgen/biome/dino_jungle.json`
-  - Defines the biome resource used by TerraBlender.
+  - Defines the internal biome painted into the generated cavern volume.
 - `ModBiomes.DINO_JUNGLE`
-  - Resource key for future spawn rules and biome checks.
-- `PrehistoriaOverworldRegion`
-  - Registers the biome into TerraBlender's overworld climate map as a warm/wet underground slice.
-- `DinoJungleDecoratorFeature`
-  - Runs chunk-locally in the dino jungle biome.
-  - Carves an underground biome-sized cavity between Y -50 and Y 30.
-  - Builds floor/roof, a bedrock shell, plants, trees, lights, and stalactites.
-- `DinoJungleEntranceFeature`
-  - Runs rarely in the overworld.
-  - If the chunk has dino jungle below, it carves a shaft down to it.
-  - It always creates a natural lake under that entrance.
+  - Resource key used by generation and spawn checks.
+- `DinoJungleCavernStructure`
+  - Finds valid overworld positions, depth, size, and entrance location.
+- `DinoJungleCavernPiece`
+  - Builds the cavern, paints the biome, creates the lake/shaft, and handles plants, trees, glow berries, vines, and organic walls.
+- `ModEntitySpawns`
+  - Registers spawn placement rules for the giant squid, Megameli, and natural sniffer spawning.
 
-## Why the generator is chunk-local
+## Removed legacy path
 
-The previous prototype was a single large feature. Minecraft crashed because large features can try to write into chunks too far from the chunk currently being generated.
+The old `DinoJungleFeature`, `DinoJungleDecoratorFeature`, `DinoJungleEntranceFeature`, `DinoJungleMath`, placed features, configured features, and TerraBlender region were removed. They belonged to the older biome-feature generator and are no longer used by the structure version.
 
-This version never writes outside the current chunk in X/Z. That means the full biome is built chunk by chunk instead of as one enormous feature.
+## Current tuning knobs
 
-## Future mob spawns
+- Cavern frequency: `worldgen/structure_set/dino_jungle_caverns.json`
+  - `spacing`: average grid distance between attempts.
+  - `separation`: minimum distance between attempts.
+- Cavern dimensions/depth: `DinoJungleCavernStructure`
+  - `radiusX`, `radiusY`, `radiusZ`, and `wantedDepth`.
+- Wall/floor materials: `DinoJungleCavernPiece#wallState`, `floorState`, `fillerState`, `ceilingState`.
+- Vegetation density: `placePlant`, `placeTree`, `placeGlowBerryVines`, `placeTreeVines`.
+- Mob balance: `dino_jungle.json`, `dino_jungle_cavern.json`, and the random throttles in `ModEntitySpawns`.
 
-When you add prehistoric mobs, target the biome directly:
+## Spawn balance
 
-```java
-BiomeModifications.addSpawn(
-        BiomeSelectors.includeByKey(ModBiomes.DINO_JUNGLE),
-        MobCategory.CREATURE,
-        ModEntities.YOUR_DINO,
-        80,
-        1,
-        3
-);
-```
-
-Then add a normal `SpawnPlacements.register(...)` rule for the mob.
-
-## Tuning
-
-- Biome frequency: `MinecraftPrehistoria#onTerraBlenderInitialized`, region weight currently `6`.
-- Entrance rarity: `placed_feature/dino_jungle_entrance.json`, `chance` currently `180`.
-- Floor/roof Y range: `DinoJungleMath.MIN_Y` and `MAX_Y`; biome columns are detected by sampling several Y values in that range.
-- Light density: `DinoJungleDecoratorFeature#placeCeilingLight` and `placeWallOrFloorLight`.
-
-
-## Fix2 note
-
-The legacy `minecraft-prehistoria:dino_jungle` feature id is now registered as a safe alias for the chunk-local decorator. This avoids registry crashes from stale V0 `dino_jungle.json` configured features left in `build/resources` or an overwritten local project. Still run `./gradlew.bat clean runClient` after replacing files.
-
-
-## fix3 note: normal Overworld biome injection
-
-The first TerraBlender version used one raw Climate.ParameterPoint, which made the biome valid in Single Biome worlds but too hard to find in a normal Overworld.
-
-fix3 changes PrehistoriaOverworldRegion to use TerraBlender's VanillaParameterOverlayBuilder + ParameterPointListBuilder pattern. It also temporarily raises the region weight to 60 so `/locate biome minecraft-prehistoria:dino_jungle` can find the biome during testing. After verifying generation, try lowering the weight to 20, 12, or 6.
+Sniffers and Megameli are both under the `creature` category now. Megameli used to be listed under `ambient`, which did not match its `MobCategory.CREATURE` entity type and made balancing messy. Sniffers also needed an explicit `SpawnPlacements` rule because vanilla sniffers do not naturally spawn from biome JSON alone.

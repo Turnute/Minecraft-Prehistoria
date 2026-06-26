@@ -4,7 +4,6 @@ import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import terrablender.api.TerraBlenderApi;
 import turnute.mcprehistoria.archaeology.ExcavationDescriptions;
 import turnute.mcprehistoria.archaeology.ModArchaeology;
 import turnute.mcprehistoria.entity.ModEntitySpawns;
@@ -12,7 +11,7 @@ import turnute.mcprehistoria.registry.*;
 import turnute.mcprehistoria.village.ModVillagers;
 import turnute.mcprehistoria.world.ModWorldgen;
 
-public class MinecraftPrehistoria implements ModInitializer, TerraBlenderApi {
+public class MinecraftPrehistoria implements ModInitializer {
     public static final String MOD_ID = "minecraft-prehistoria";
     public static final String MOD_NAME = "Minecraft Prehistoria";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
@@ -34,13 +33,6 @@ public class MinecraftPrehistoria implements ModInitializer, TerraBlenderApi {
         ModCreativeTabs.register();
     }
 
-    @Override
-    public void onTerraBlenderInitialized() {
-        // Dino Jungle is intentionally generated as a Structure now.
-        // TerraBlender is left available for later biome work, but the V1 climate
-        // injection is disabled so dino_jungle cannot appear as a random surface slice.
-        LOGGER.info("Dino Jungle TerraBlender climate injection disabled for {}", MOD_NAME);
-    }
 
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);

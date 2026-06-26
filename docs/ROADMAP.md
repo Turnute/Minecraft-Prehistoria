@@ -51,7 +51,7 @@ Objectif : le gros showcase.
 Version pragmatique :
 
 - structure unique type room/cavern préfabriquée
-- enveloppe bedrock
+- parois organiques pierre/tuff/deepslate/mousse/rooted dirt
 - jungle vanilla dedans
 - suspicious blocks
 - spawns de mobs

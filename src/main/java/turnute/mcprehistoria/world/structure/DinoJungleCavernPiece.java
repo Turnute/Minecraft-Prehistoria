@@ -10,6 +10,8 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CaveVines;
+import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -150,7 +152,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
                     if (footprint <= INNER_FOOTPRINT) {
                         placeInteriorColumnBlock(level, pos, x, y, z, floorY, roofY);
                     } else if (y >= floorY - FLOOR_SHELL_THICKNESS && y <= roofY + ROOF_SHELL_THICKNESS) {
-                        level.setBlock(pos, Blocks.BEDROCK.defaultBlockState(), 2);
+                        level.setBlock(pos, wallState(x, y, z), 2);
                     }
                 }
             }
@@ -171,7 +173,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
         }
 
         if (y == floorY - FLOOR_SHELL_THICKNESS) {
-            level.setBlock(pos, Blocks.BEDROCK.defaultBlockState(), 2);
+            level.setBlock(pos, wallState(x, y, z), 2);
         } else if (y < floorY) {
             level.setBlock(pos, fillerState(x, y, z), 2);
         } else if (y == floorY) {
@@ -272,8 +274,8 @@ public class DinoJungleCavernPiece extends StructurePiece {
         int roofY = roofY(entrance.getX(), entrance.getZ());
         BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-        // The air column starts just above the lake, but the bedrock/stone ring only starts at the ceiling.
-        // That gives an actual hole in the roof instead of a bedrock pipe descending into the cavern.
+        // The air column starts just above the lake, but the organic wall ring only starts at the ceiling.
+        // That gives an actual hole in the roof instead of a pipe descending into the cavern.
         for (int y = lakeWaterY + 1; y <= surfaceY + 1; y++) {
             for (int dx = -SHAFT_WALL_RADIUS; dx <= SHAFT_WALL_RADIUS; dx++) {
                 for (int dz = -SHAFT_WALL_RADIUS; dz <= SHAFT_WALL_RADIUS; dz++) {
@@ -300,7 +302,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
 
             if (y >= roofY + 4 && y < surfaceY - 8 && y % 17 == Math.floorMod(hash(entrance.getX(), y, entrance.getZ(), 300), 17)) {
                 pos.set(entrance.getX() + SHAFT_AIR_RADIUS, y, entrance.getZ());
-                placeIfInBounds(level, chunkBounds, pos, Blocks.GLOWSTONE.defaultBlockState());
+                placeIfInBounds(level, chunkBounds, pos, Blocks.SHROOMLIGHT.defaultBlockState());
             }
         }
     }
@@ -321,6 +323,9 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 int roofY = roofY(x, z);
 
                 placeCeilingLight(level, chunkBounds, x, z, roofY);
+                placeGlowBerryVines(level, chunkBounds, x, z, roofY, floorY);
+                placeHangingRoots(level, chunkBounds, x, z, roofY);
+                placeSporeBlossom(level, chunkBounds, x, z, roofY);
                 placeStalactite(level, chunkBounds, x, z, roofY, floorY);
                 placePlant(level, chunkBounds, x, z, floorY);
                 placeTree(level, chunkBounds, x, z, floorY, roofY);
@@ -383,15 +388,48 @@ public class DinoJungleCavernPiece extends StructurePiece {
     }
 
     private void placeCeilingLight(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int roofY) {
-        if (hashRange(x, roofY, z, 41, 130) != 0) {
+        if (hashRange(x, roofY, z, 41, 56) != 0) {
             return;
         }
 
         BlockPos pos = new BlockPos(x, roofY, z);
-        BlockState glow = hashRange(x, roofY, z, 42, 2) == 0
-                ? Blocks.GLOWSTONE.defaultBlockState()
-                : Blocks.SHROOMLIGHT.defaultBlockState();
+        BlockState glow = switch (hashRange(x, roofY, z, 42, 4)) {
+            case 0 -> Blocks.VERDANT_FROGLIGHT.defaultBlockState();
+            case 1 -> Blocks.OCHRE_FROGLIGHT.defaultBlockState();
+            default -> Blocks.SHROOMLIGHT.defaultBlockState();
+        };
         placeIfInBounds(level, chunkBounds, pos, glow);
+    }
+
+    private void placeGlowBerryVines(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int roofY, int floorY) {
+        if (hashRange(x, roofY, z, 45, 13) != 0) {
+            return;
+        }
+
+        int maxLength = Math.min(2 + hashRange(x, roofY, z, 46, 6), Math.max(1, roofY - floorY - 5));
+        placeHangingCaveVine(level, chunkBounds, x, roofY - 1, z, maxLength, true, 47);
+    }
+
+    private void placeHangingRoots(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int roofY) {
+        if (hashRange(x, roofY, z, 48, 18) != 0) {
+            return;
+        }
+
+        BlockPos pos = new BlockPos(x, roofY - 1, z);
+        if (chunkBounds.isInside(pos) && !level.isOutsideBuildHeight(pos) && level.getBlockState(pos).isAir()) {
+            level.setBlock(pos, Blocks.HANGING_ROOTS.defaultBlockState(), 2);
+        }
+    }
+
+    private void placeSporeBlossom(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int roofY) {
+        if (hashRange(x, roofY, z, 49, 180) != 0) {
+            return;
+        }
+
+        BlockPos pos = new BlockPos(x, roofY - 1, z);
+        if (chunkBounds.isInside(pos) && !level.isOutsideBuildHeight(pos) && level.getBlockState(pos).isAir()) {
+            level.setBlock(pos, Blocks.SPORE_BLOSSOM.defaultBlockState(), 2);
+        }
     }
 
     private void placeStalactite(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int roofY, int floorY) {
@@ -420,42 +458,70 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 level.isOutsideBuildHeight(plantPos)
                         || !level.getBlockState(plantPos).isAir()
                         || !level.getFluidState(plantPos).isEmpty()
-                        || !level.getBlockState(groundPos).is(Blocks.GRASS_BLOCK)
+                        || !isPlantableDinoFloor(level.getBlockState(groundPos))
         ) {
             return;
         }
 
-        int roll = hashRange(x, floorY, z, 60, 100);
-        BlockState plant = null;
-
-        if (roll < 18) {
-            plant = Blocks.SHORT_GRASS.defaultBlockState();
-        } else if (roll < 27) {
-            plant = Blocks.FERN.defaultBlockState();
-        } else if (roll < 34) {
-            plant = Blocks.BAMBOO.defaultBlockState();
-        } else if (roll < 36) {
-            plant = Blocks.JUNGLE_SAPLING.defaultBlockState();
-        } else if (roll < 42) {
-            plant = Blocks.PITCHER_PLANT.defaultBlockState();
-        } else if (roll < 48) {
-            plant = Blocks.TORCH.defaultBlockState();
-        } else if (roll < 54) {
-            plant = Blocks.MOSS_CARPET.defaultBlockState();
-        }
-
-        if (plant == null) {
+        // Do not plant on every single floor block: the cavern should feel lush, not carpeted.
+        if (hashRange(x, floorY, z, 59, 2) != 0) {
             return;
         }
 
-        BlockPos pos = new BlockPos(x, floorY + 1, z);
+        int roll = hashRange(x, floorY, z, 60, 100);
+
+        if (roll < 30) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.SHORT_GRASS.defaultBlockState());
+        } else if (roll < 50) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.FERN.defaultBlockState());
+        } else if (roll < 66) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.MOSS_CARPET.defaultBlockState());
+        } else if (roll < 72) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.BAMBOO.defaultBlockState());
+        } else if (roll < 78) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.JUNGLE_SAPLING.defaultBlockState());
+        } else if (roll < 85) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.AZALEA.defaultBlockState());
+        } else if (roll < 91) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.FLOWERING_AZALEA.defaultBlockState());
+        } else if (roll < 92) {
+            placeSinglePlant(level, chunkBounds, plantPos, Blocks.TORCHFLOWER.defaultBlockState());
+        } else if (roll < 93) {
+            placePitcherPlant(level, chunkBounds, plantPos);
+        }
+    }
+
+    private void placeSinglePlant(WorldGenLevel level, BoundingBox chunkBounds, BlockPos pos, BlockState plant) {
         if (chunkBounds.isInside(pos) && !level.isOutsideBuildHeight(pos) && level.getBlockState(pos).isAir()) {
             level.setBlock(pos, plant, 2);
         }
     }
 
+    private void placePitcherPlant(WorldGenLevel level, BoundingBox chunkBounds, BlockPos pos) {
+        BlockPos upper = pos.above();
+        if (
+                chunkBounds.isInside(pos)
+                        && chunkBounds.isInside(upper)
+                        && !level.isOutsideBuildHeight(pos)
+                        && !level.isOutsideBuildHeight(upper)
+                        && level.getBlockState(pos).isAir()
+                        && level.getBlockState(upper).isAir()
+        ) {
+            DoublePlantBlock.placeAt(level, Blocks.PITCHER_PLANT.defaultBlockState(), pos, 2);
+        }
+    }
+
+    private static boolean isPlantableDinoFloor(BlockState state) {
+        return state.is(Blocks.GRASS_BLOCK)
+                || state.is(Blocks.MOSS_BLOCK)
+                || state.is(Blocks.MUD)
+                || state.is(Blocks.ROOTED_DIRT)
+                || state.is(Blocks.COARSE_DIRT)
+                || state.is(Blocks.DIRT);
+    }
+
     private void placeTree(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int floorY, int roofY) {
-        int treeChance = 60;    // smaller = more dense
+        int treeChance = 45;    // smaller = more dense
         int treeSuccesses = 2;
 
         if (hashRange(x, floorY, z, 70, treeChance) >= treeSuccesses) {
@@ -502,6 +568,81 @@ public class DinoJungleCavernPiece extends StructurePiece {
                     }
                 }
             }
+        }
+
+        placeTreeCanopyLight(level, chunkBounds, x, topY, z);
+        placeTreeVines(level, chunkBounds, x, topY, z);
+    }
+
+    private void placeTreeCanopyLight(WorldGenLevel level, BoundingBox chunkBounds, int x, int topY, int z) {
+        if (hashRange(x, topY, z, 73, 3) != 0) {
+            return;
+        }
+
+        BlockPos pos = new BlockPos(x, topY, z);
+        if (chunkBounds.isInside(pos) && !level.isOutsideBuildHeight(pos)) {
+            level.setBlock(pos, Blocks.SHROOMLIGHT.defaultBlockState(), 2);
+        }
+    }
+
+    private void placeTreeVines(WorldGenLevel level, BoundingBox chunkBounds, int x, int topY, int z) {
+        for (int dx = -3; dx <= 3; dx++) {
+            for (int dz = -3; dz <= 3; dz++) {
+                int flatDistance = Math.abs(dx) + Math.abs(dz);
+                if (flatDistance < 3 || flatDistance > 5 || hashRange(x + dx, topY, z + dz, 74, 4) != 0) {
+                    continue;
+                }
+
+                BlockPos support = new BlockPos(x + dx, topY - 1, z + dz);
+                BlockPos start = support.below();
+                if (
+                        !chunkBounds.isInside(support)
+                                || !chunkBounds.isInside(start)
+                                || level.isOutsideBuildHeight(support)
+                                || level.isOutsideBuildHeight(start)
+                                || !level.getBlockState(support).is(Blocks.JUNGLE_LEAVES)
+                                || !level.getBlockState(start).isAir()
+                ) {
+                    continue;
+                }
+
+                int length = 1 + hashRange(x + dx, topY, z + dz, 75, 4);
+                placeHangingCaveVine(level, chunkBounds, start.getX(), start.getY(), start.getZ(), length, false, 76);
+            }
+        }
+    }
+
+    private void placeHangingCaveVine(
+            WorldGenLevel level,
+            BoundingBox chunkBounds,
+            int x,
+            int startY,
+            int z,
+            int length,
+            boolean bright,
+            int salt
+    ) {
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+        int placed = 0;
+
+        for (int i = 0; i < length; i++) {
+            pos.set(x, startY - i, z);
+            if (!chunkBounds.isInside(pos) || level.isOutsideBuildHeight(pos) || !level.getBlockState(pos).isAir()) {
+                break;
+            }
+            placed++;
+        }
+
+        for (int i = 0; i < placed; i++) {
+            pos.set(x, startY - i, z);
+            boolean head = i == placed - 1;
+            boolean berries = bright
+                    ? (head || hashRange(x, startY - i, z, salt, 3) == 0)
+                    : (head && hashRange(x, startY - i, z, salt, 5) == 0);
+            BlockState vine = (head ? Blocks.CAVE_VINES : Blocks.CAVE_VINES_PLANT)
+                    .defaultBlockState()
+                    .setValue(CaveVines.BERRIES, berries);
+            level.setBlock(pos, vine, 2);
         }
     }
 
@@ -562,33 +703,58 @@ public class DinoJungleCavernPiece extends StructurePiece {
         }
 
         if (y >= surfaceY - 12) {
-            return Blocks.STONE.defaultBlockState();
+            return switch (hashRange(entrance.getX(), y, entrance.getZ(), 201, 5)) {
+                case 0 -> Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+                case 1 -> Blocks.ROOTED_DIRT.defaultBlockState();
+                default -> Blocks.STONE.defaultBlockState();
+            };
         }
 
-        return Blocks.BEDROCK.defaultBlockState();
+        return wallState(entrance.getX(), y, entrance.getZ());
     }
 
     private static BlockState floorState(int x, int z) {
-        return switch (hashRange(x, 0, z, 10, 10)) {
+        return switch (hashRange(x, 0, z, 10, 12)) {
             case 0 -> Blocks.MUD.defaultBlockState();
             case 1 -> Blocks.ROOTED_DIRT.defaultBlockState();
             case 2 -> Blocks.COARSE_DIRT.defaultBlockState();
+            case 3, 4 -> Blocks.MOSS_BLOCK.defaultBlockState();
             default -> Blocks.GRASS_BLOCK.defaultBlockState();
         };
     }
 
     private static BlockState fillerState(int x, int y, int z) {
-        return switch (hashRange(x, y, z, 11, 6)) {
+        return switch (hashRange(x, y, z, 11, 8)) {
             case 0 -> Blocks.MUD.defaultBlockState();
             case 1 -> Blocks.COARSE_DIRT.defaultBlockState();
+            case 2 -> Blocks.ROOTED_DIRT.defaultBlockState();
+            case 3 -> Blocks.MOSS_BLOCK.defaultBlockState();
             default -> Blocks.DIRT.defaultBlockState();
         };
     }
 
     private static BlockState ceilingState(int x, int y, int z) {
-        return hashRange(x, y, z, 12, 12) == 0
-                ? Blocks.DRIPSTONE_BLOCK.defaultBlockState()
-                : Blocks.BEDROCK.defaultBlockState();
+        return switch (hashRange(x, y, z, 12, 16)) {
+            case 0 -> Blocks.DRIPSTONE_BLOCK.defaultBlockState();
+            case 1, 2 -> Blocks.MOSS_BLOCK.defaultBlockState();
+            case 3 -> Blocks.ROOTED_DIRT.defaultBlockState();
+            case 4 -> Blocks.TUFF.defaultBlockState();
+            case 5 -> Blocks.CALCITE.defaultBlockState();
+            case 6 -> Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+            default -> wallState(x, y, z);
+        };
+    }
+
+    private static BlockState wallState(int x, int y, int z) {
+        return switch (hashRange(x, y, z, 13, 18)) {
+            case 0, 1 -> Blocks.MOSS_BLOCK.defaultBlockState();
+            case 2 -> Blocks.ROOTED_DIRT.defaultBlockState();
+            case 3 -> Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+            case 4, 5 -> Blocks.TUFF.defaultBlockState();
+            case 6 -> Blocks.CALCITE.defaultBlockState();
+            case 7, 8, 9 -> Blocks.DEEPSLATE.defaultBlockState();
+            default -> Blocks.STONE.defaultBlockState();
+        };
     }
 
     private static BlockState lakeBottomState(int x, int y, int z) {
