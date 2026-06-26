@@ -413,18 +413,34 @@ public class DinoJungleCavernPiece extends StructurePiece {
     }
 
     private void placePlant(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int floorY) {
+        BlockPos groundPos = new BlockPos(x, floorY, z);
+        BlockPos plantPos = new BlockPos(x, floorY + 1, z);
+
+        if (
+                level.isOutsideBuildHeight(plantPos)
+                        || !level.getBlockState(plantPos).isAir()
+                        || !level.getFluidState(plantPos).isEmpty()
+                        || !level.getBlockState(groundPos).is(Blocks.GRASS_BLOCK)
+        ) {
+            return;
+        }
+
         int roll = hashRange(x, floorY, z, 60, 100);
         BlockState plant = null;
 
-        if (roll < 24) {
+        if (roll < 18) {
             plant = Blocks.SHORT_GRASS.defaultBlockState();
-        } else if (roll < 36) {
+        } else if (roll < 27) {
             plant = Blocks.FERN.defaultBlockState();
-        } else if (roll < 42) {
+        } else if (roll < 34) {
             plant = Blocks.BAMBOO.defaultBlockState();
-        } else if (roll < 49) {
+        } else if (roll < 36) {
             plant = Blocks.JUNGLE_SAPLING.defaultBlockState();
-        } else if (roll < 58) {
+        } else if (roll < 42) {
+            plant = Blocks.PITCHER_PLANT.defaultBlockState();
+        } else if (roll < 48) {
+            plant = Blocks.TORCH.defaultBlockState();
+        } else if (roll < 54) {
             plant = Blocks.MOSS_CARPET.defaultBlockState();
         }
 
@@ -439,7 +455,10 @@ public class DinoJungleCavernPiece extends StructurePiece {
     }
 
     private void placeTree(WorldGenLevel level, BoundingBox chunkBounds, int x, int z, int floorY, int roofY) {
-        if (hashRange(x, floorY, z, 70, 135) != 0) {
+        int treeChance = 60;    // smaller = more dense
+        int treeSuccesses = 2;
+
+        if (hashRange(x, floorY, z, 70, treeChance) >= treeSuccesses) {
             return;
         }
 
@@ -554,7 +573,6 @@ public class DinoJungleCavernPiece extends StructurePiece {
             case 0 -> Blocks.MUD.defaultBlockState();
             case 1 -> Blocks.ROOTED_DIRT.defaultBlockState();
             case 2 -> Blocks.COARSE_DIRT.defaultBlockState();
-            case 3, 4 -> Blocks.MOSS_BLOCK.defaultBlockState();
             default -> Blocks.GRASS_BLOCK.defaultBlockState();
         };
     }
@@ -576,7 +594,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
     private static BlockState lakeBottomState(int x, int y, int z) {
         return switch (hashRange(x, y, z, 121, 9)) {
             case 0 -> Blocks.CLAY.defaultBlockState();
-            case 1 -> Blocks.MOSS_BLOCK.defaultBlockState();
+            case 1 -> Blocks.GRAVEL.defaultBlockState();
             default -> Blocks.SAND.defaultBlockState();
         };
     }

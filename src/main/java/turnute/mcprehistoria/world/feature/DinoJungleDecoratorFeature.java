@@ -159,9 +159,15 @@ public class DinoJungleDecoratorFeature extends Feature<NoneFeatureConfiguration
     }
 
     private static void placePlants(WorldGenLevel level, RandomSource random, int x, int z, int floorY) {
+        BlockPos groundPos = new BlockPos(x, floorY, z);
         BlockPos plantPos = new BlockPos(x, floorY + 1, z);
 
-        if (level.isOutsideBuildHeight(plantPos) || !level.getBlockState(plantPos).isAir() || !level.getFluidState(plantPos).isEmpty()) {
+        if (
+                level.isOutsideBuildHeight(plantPos)
+                || !level.getBlockState(plantPos).isAir()
+                || !level.getFluidState(plantPos).isEmpty()
+                || !level.getBlockState(groundPos).is(Blocks.GRASS_BLOCK)
+        ) {
             return;
         }
 
@@ -174,9 +180,13 @@ public class DinoJungleDecoratorFeature extends Feature<NoneFeatureConfiguration
             plant = Blocks.FERN.defaultBlockState();
         } else if (roll < 34) {
             plant = Blocks.BAMBOO.defaultBlockState();
-        } else if (roll < 41) {
+        } else if (roll < 36) {
             plant = Blocks.JUNGLE_SAPLING.defaultBlockState();
+        } else if (roll < 42) {
+            plant = Blocks.PITCHER_PLANT.defaultBlockState();
         } else if (roll < 48) {
+            plant = Blocks.TORCHFLOWER.defaultBlockState();
+        } else if (roll < 54) {
             plant = Blocks.MOSS_CARPET.defaultBlockState();
         }
 
@@ -186,7 +196,7 @@ public class DinoJungleDecoratorFeature extends Feature<NoneFeatureConfiguration
     }
 
     private static void placeTree(WorldGenLevel level, RandomSource random, int chunkStartX, int chunkStartZ, int x, int z, int floorY, int roofY) {
-        if (!DinoJungleMath.chance(x, floorY, z, 71, 70)) {
+        if (!DinoJungleMath.chance(x, floorY, z, 71, 95)) {
             return;
         }
 
@@ -244,7 +254,6 @@ public class DinoJungleDecoratorFeature extends Feature<NoneFeatureConfiguration
             case 0 -> Blocks.MUD.defaultBlockState();
             case 1 -> Blocks.DIRT.defaultBlockState();
             case 2 -> Blocks.COARSE_DIRT.defaultBlockState();
-            case 3 -> Blocks.MOSS_BLOCK.defaultBlockState();
             default -> Blocks.GRASS_BLOCK.defaultBlockState();
         };
     }
