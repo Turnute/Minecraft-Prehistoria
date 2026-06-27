@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "hatch=0": {
+      "model": "minecraft-prehistoria:block/megameli_egg"
+    },
+    "hatch=1": {
+      "model": "minecraft-prehistoria:block/megameli_egg"
+    },
+    "hatch=2": {
+      "model": "minecraft-prehistoria:block/megameli_egg"
+    }
+  }
+}

@@ -26,11 +26,19 @@ public final class ModCreativeTabs {
                 // ========================
                 // !!! ADD BLOCK & ITEMS HERE !!!
 
+                // Blocks
                 output.accept(ModBlocks.EXCAVATION_TABLE);
+
+                // Plants & Items
                 output.accept(ModBlocks.BLUE_MUSHROOM);
+                output.accept(ModItems.ANCIENT_BONE);
+
+                // Hatchable Eggs
+                output.accept(ModBlocks.MEGAMELI_EGG);
+
+                // Spawn Eggs
                 output.accept(ModItems.GIANT_SQUID_SPAWN_EGG);
                 output.accept(ModItems.MEGAMELI_SPAWN_EGG);
-                output.accept(ModItems.ANCIENT_BONE);
 
                 // !!! ADD BLOCK & ITEMS HERE !!!
                 // ========================

@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import turnute.mcprehistoria.MinecraftPrehistoria;
 import turnute.mcprehistoria.block.BlueMushroomBlock;
 import turnute.mcprehistoria.block.ExcavationTableBlock;
+import turnute.mcprehistoria.block.HatchingEggBlock;
 
 
 /**
@@ -40,6 +41,17 @@ public final class ModBlocks {
 					.instabreak()
 					.sound(SoundType.GRASS)
 					.lightLevel(state -> 14),
+			true
+	);
+
+	public static final Block MEGAMELI_EGG = register(
+			"megameli_egg",
+			properties -> new HatchingEggBlock(ModEntities.MEGAMELI, properties),
+			BlockBehaviour.Properties.of()
+					.strength(0.5F)
+					.sound(SoundType.DRIED_GHAST)
+					.randomTicks()
+					.noOcclusion(),
 			true
 	);
 
