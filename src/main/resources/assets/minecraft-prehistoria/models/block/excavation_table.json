@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "minecraft-prehistoria:block/excavation_table"
+    "particle": "minecraft-prehistoria:block/excavation_table_top",
+    "down": "minecraft-prehistoria:block/excavation_table_bottom",
+    "up": "minecraft-prehistoria:block/excavation_table_top",
+    "north": "minecraft-prehistoria:block/excavation_table_north",
+    "south": "minecraft-prehistoria:block/excavation_table_south",
+    "east": "minecraft-prehistoria:block/excavation_table_east",
+    "west": "minecraft-prehistoria:block/excavation_table_west"
   }
 }
