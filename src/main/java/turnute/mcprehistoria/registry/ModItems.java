@@ -33,6 +33,12 @@ public final class ModItems {
 			new Item.Properties().spawnEgg(ModEntities.MEGAMELI)
 	);
 
+	public static final Item ANCIENT_BONE = register(
+			"ancient_bone",
+			Item::new,
+			new Item.Properties()
+	);
+
 	private static Item register(String name, Function<Item.Properties, Item> itemFactory, Item.Properties properties) {
 		ResourceKey<Item> itemKey = ResourceKey.create(
 				Registries.ITEM,

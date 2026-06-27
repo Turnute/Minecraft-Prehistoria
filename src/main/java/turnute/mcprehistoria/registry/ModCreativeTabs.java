@@ -30,6 +30,7 @@ public final class ModCreativeTabs {
                 output.accept(ModBlocks.BLUE_MUSHROOM);
                 output.accept(ModItems.GIANT_SQUID_SPAWN_EGG);
                 output.accept(ModItems.MEGAMELI_SPAWN_EGG);
+                output.accept(ModItems.ANCIENT_BONE);
 
                 // !!! ADD BLOCK & ITEMS HERE !!!
                 // ========================

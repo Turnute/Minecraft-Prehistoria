@@ -18,6 +18,7 @@ public class ExcavationDescriptions {
         DESCRIPTIONS.put(ModBlocks.BLUE_MUSHROOM.asItem(), Component.literal("Blue Mushroom: An ancient species of mushrooms that survived in a remote place. Emits a bright natural light."));
         DESCRIPTIONS.put(ModItems.GIANT_SQUID_SPAWN_EGG, Component.literal("Giant Squid Spawn Egg: Spawns a Giant Squid Entity."));
         DESCRIPTIONS.put(ModItems.MEGAMELI_SPAWN_EGG, Component.literal("Megameli Spawn Egg: Spawns a Megameli Entity."));
+        DESCRIPTIONS.put(ModItems.ANCIENT_BONE, Component.literal("Ancient Bone: TODO"));
     }
 
     public static Component getDescription(final Item item) {
