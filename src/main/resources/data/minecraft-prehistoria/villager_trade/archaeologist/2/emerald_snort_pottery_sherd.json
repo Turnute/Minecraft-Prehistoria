@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 7.0
+  },
+  "gives": {
+    "id": "minecraft:snort_pottery_sherd"
+  },
+  "max_uses": 4.0,
+  "reputation_discount": 0.2,
+  "xp": 10.0
+}

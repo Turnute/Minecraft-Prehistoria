@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import turnute.mcprehistoria.MinecraftPrehistoria;
+import turnute.mcprehistoria.block.BlueMushroomBlock;
 import turnute.mcprehistoria.block.ExcavationTableBlock;
 
 
@@ -27,6 +28,18 @@ public final class ModBlocks {
 			"excavation_table",
 			ExcavationTableBlock::new,
 			BlockBehaviour.Properties.of().strength(2.5f).sound(SoundType.WOOD),
+			true
+	);
+
+	public static final Block BLUE_MUSHROOM = register(
+			"blue_mushroom",
+			BlueMushroomBlock::new,
+			BlockBehaviour.Properties.of()
+					.noCollision()
+					.noOcclusion()
+					.instabreak()
+					.sound(SoundType.GRASS)
+					.lightLevel(state -> 14),
 			true
 	);
 

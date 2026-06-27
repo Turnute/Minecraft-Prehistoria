@@ -21,6 +21,7 @@ import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
@@ -50,6 +51,12 @@ public class MegameliEntity extends Bee implements GeoEntity {
     private static final String OWNER_UUID_KEY = "OwnerUUID";
 
     private static final int TAMING_CHANCE = 3;
+
+    private static final double AZALEA_UNSTUCK_VERTICAL_BOOST = 0.1D;
+    private static final double AZALEA_UNSTUCK_HORIZONTAL_NUDGE = 0.28D;
+    private static final int AZALEA_UNSTUCK_COOLDOWN_TICKS = 10;
+
+    private int azaleaUnstuckCooldown;
 
     private static final EntityDataAccessor<Boolean> DATA_TAMED = SynchedEntityData.defineId(
             MegameliEntity.class,
@@ -301,5 +308,55 @@ public class MegameliEntity extends Bee implements GeoEntity {
 
     @Override
     public void setInLove(@Nullable Player player) {
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        if (!this.level().isClientSide()) {
+            tickAzaleaUnstuck();
+        }
+    }
+
+    private void tickAzaleaUnstuck() {
+        if (this.azaleaUnstuckCooldown > 0) {
+            this.azaleaUnstuckCooldown--;
+            return;
+        }
+
+        if (!this.isOnOrInsideAzalea()) {
+            return;
+        }
+
+        this.getNavigation().stop();
+
+        Vec3 currentMotion = this.getDeltaMovement();
+
+        double nudgeX = (this.random.nextDouble() - 0.5D) * AZALEA_UNSTUCK_HORIZONTAL_NUDGE;
+        double nudgeZ = (this.random.nextDouble() - 0.5D) * AZALEA_UNSTUCK_HORIZONTAL_NUDGE;
+
+        this.setDeltaMovement(
+                currentMotion.x + nudgeX,
+                Math.max(currentMotion.y, AZALEA_UNSTUCK_VERTICAL_BOOST),
+                currentMotion.z + nudgeZ
+        );
+
+        this.fallDistance = 0.0F;
+        // this.hasImpulse = true;
+
+        this.azaleaUnstuckCooldown = AZALEA_UNSTUCK_COOLDOWN_TICKS;
+    }
+
+    private boolean isOnOrInsideAzalea() {
+        BlockPos feetPos = this.blockPosition();
+        BlockPos belowPos = feetPos.below();
+
+        return isAzaleaBlock(feetPos) || isAzaleaBlock(belowPos);
+    }
+
+    private boolean isAzaleaBlock(BlockPos pos) {
+        return this.level().getBlockState(pos).is(Blocks.AZALEA)
+                || this.level().getBlockState(pos).is(Blocks.FLOWERING_AZALEA);
     }
 }

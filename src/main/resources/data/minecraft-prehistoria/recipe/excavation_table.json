@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BB ",
+    "PP ",
+    "PP "
+  ],
+  "key": {
+    "B": "minecraft:bone",
+    "P": "#minecraft:planks"
+  },
+  "result": {
+    "id": "minecraft-prehistoria:excavation_table",
+    "count": 1
+  }
+}

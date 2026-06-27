@@ -27,6 +27,7 @@ public final class ModCreativeTabs {
                 // !!! ADD BLOCK & ITEMS HERE !!!
 
                 output.accept(ModBlocks.EXCAVATION_TABLE);
+                output.accept(ModBlocks.BLUE_MUSHROOM);
                 output.accept(ModItems.GIANT_SQUID_SPAWN_EGG);
                 output.accept(ModItems.MEGAMELI_SPAWN_EGG);
 

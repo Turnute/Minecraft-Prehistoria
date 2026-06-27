@@ -1,5 +1,6 @@
 package turnute.mcprehistoria.world.structure;
 
+import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -25,7 +26,8 @@ import net.minecraft.world.level.chunk.PalettedContainerRO;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
-import turnute.mcprehistoria.entity.insect.MegameliEntity;
+import turnute.mcprehistoria.block.BlueMushroomBlock;
+import turnute.mcprehistoria.registry.ModBlocks;
 import turnute.mcprehistoria.registry.ModEntities;
 import turnute.mcprehistoria.world.biome.ModBiomes;
 
@@ -145,7 +147,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
                     spawnCavernMob(level, chunkBounds, spawnPos, EntityType.SNIFFER, 901);
                 }
 
-                if(hashRange(x, floorY, z, 902, 1800) == 0) {
+                if(hashRange(x, floorY, z, 902, 1400) == 0) {
                     spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.MEGAMELI, 903);
                 }
             }
@@ -567,17 +569,19 @@ public class DinoJungleCavernPiece extends StructurePiece {
         } else if (roll < 66) {
             placeSinglePlant(level, chunkBounds, plantPos, Blocks.MOSS_CARPET.defaultBlockState());
         } else if (roll < 72) {
-            placeSinglePlant(level, chunkBounds, plantPos, Blocks.BAMBOO.defaultBlockState());
-        } else if (roll < 78) {
+            placeBamboo(level, chunkBounds, plantPos);
+        } else if (roll < 76) {
             placeSinglePlant(level, chunkBounds, plantPos, Blocks.JUNGLE_SAPLING.defaultBlockState());
-        } else if (roll < 85) {
+        } else if (roll < 78) {
             placeSinglePlant(level, chunkBounds, plantPos, Blocks.AZALEA.defaultBlockState());
-        } else if (roll < 91) {
+        } else if (roll < 79) {
             placeSinglePlant(level, chunkBounds, plantPos, Blocks.FLOWERING_AZALEA.defaultBlockState());
-        } else if (roll < 92) {
+        } else if (roll < 80) {
             placeSinglePlant(level, chunkBounds, plantPos, Blocks.TORCHFLOWER.defaultBlockState());
-        } else if (roll < 93) {
+        } else if (roll < 81) {
             placePitcherPlant(level, chunkBounds, plantPos);
+        } else if (roll < 90) {
+            placeBlueMushroom(level, chunkBounds, plantPos);
         }
     }
 
@@ -598,6 +602,29 @@ public class DinoJungleCavernPiece extends StructurePiece {
                         && level.getBlockState(upper).isAir()
         ) {
             DoublePlantBlock.placeAt(level, Blocks.PITCHER_PLANT.defaultBlockState(), pos, 2);
+        }
+    }
+
+    private void placeBamboo(WorldGenLevel level, BoundingBox chunkBounds, BlockPos pos)
+    {
+        if (chunkBounds.isInside(pos) && !level.isOutsideBuildHeight(pos) && level.getBlockState(pos).isAir()) {
+            BlockState plant = Blocks.BAMBOO.defaultBlockState();
+            level.setBlock(pos, plant, 2);
+
+            Random ran = new Random();
+
+            int roll = ran.nextInt(10);
+            BlockPos newPos = pos;
+            for(int i = 0 ; i < roll - 1 ; i++) {
+                newPos = newPos.above();
+                level.setBlock(newPos, plant, 2);
+            }
+        }
+    }
+
+    private void placeBlueMushroom(WorldGenLevel level, BoundingBox chunkBounds, BlockPos pos) {
+        if (chunkBounds.isInside(pos) && !level.isOutsideBuildHeight(pos) && level.getBlockState(pos).isAir()) {
+            level.setBlock(pos, ModBlocks.BLUE_MUSHROOM.defaultBlockState(), 2);
         }
     }
 

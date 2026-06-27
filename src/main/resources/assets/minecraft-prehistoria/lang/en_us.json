@@ -7,5 +7,7 @@
   "villager.minecraft-prehistoria.archaeologist": "Archaeologist",
   "item.minecraft-prehistoria.dino_jungle_map": "Dino Dino Jungle Map",
   "entity.minecraft-prehistoria.megameli": "Megameli",
-  "item.minecraft-prehistoria.megameli_spawn_egg": "Megameli Spawn Egg"
+  "item.minecraft-prehistoria.megameli_spawn_egg": "Megameli Spawn Egg",
+  "entity.minecraft-prehistoria.villager.archaeologist": "Archaeologist",
+  "block.minecraft-prehistoria.blue_mushroom": "Blue Mushroom"
 }
