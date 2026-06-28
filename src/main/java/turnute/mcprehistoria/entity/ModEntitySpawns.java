@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import turnute.mcprehistoria.MinecraftPrehistoria;
 import turnute.mcprehistoria.entity.aquatic.GiantSquidEntity;
+import turnute.mcprehistoria.entity.dino.OdontheriumEntity;
 import turnute.mcprehistoria.entity.insect.MegameliEntity;
 import turnute.mcprehistoria.registry.ModEntities;
 import turnute.mcprehistoria.world.biome.ModBiomes;
@@ -51,6 +52,22 @@ public class ModEntitySpawns {
                 SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 ModEntitySpawns::canMegameliSpawn
+        );
+
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(ModBiomes.DINO_JUNGLE),
+                MobCategory.MONSTER,
+                ModEntities.ODONTHERIUM,
+                12,
+                1,
+                2
+        );
+
+        registerSpawnPlacementSafely(
+                ModEntities.ODONTHERIUM,
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                ModEntitySpawns::canOdontheriumSpawn
         );
 
         // Vanilla sniffers do not define natural spawn placement rules. The biome JSON can list
@@ -111,6 +128,20 @@ public class ModEntitySpawns {
 
     private static boolean isDinoJungle(ServerLevelAccessor level, BlockPos pos) {
         return level.getBiome(pos).is(ModBiomes.DINO_JUNGLE);
+    }
+
+    private static boolean canOdontheriumSpawn(
+            EntityType<OdontheriumEntity> entityType,
+            ServerLevelAccessor level,
+            EntitySpawnReason spawnReason,
+            BlockPos pos,
+            net.minecraft.util.RandomSource random
+    ) {
+        return isDinoJungle(level, pos)
+                && level.getBlockState(pos).isAir()
+                && level.getBlockState(pos.above()).isAir()
+                && level.getFluidState(pos).isEmpty()
+                && random.nextInt(6) == 0;
     }
 
     private static boolean isDinoFloor(BlockState state) {

@@ -33,6 +33,12 @@ public final class ModItems {
 			new Item.Properties().spawnEgg(ModEntities.MEGAMELI)
 	);
 
+	public static final Item ODONTHERIUM_SPAWN_EGG = register(
+			"odontherium_spawn_egg",
+			SpawnEggItem::new,
+			new Item.Properties().spawnEgg(ModEntities.ODONTHERIUM)
+	);
+
 	public static final Item ANCIENT_BONE = register(
 			"ancient_bone",
 			Item::new,

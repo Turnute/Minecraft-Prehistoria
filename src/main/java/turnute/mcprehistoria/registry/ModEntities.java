@@ -11,6 +11,7 @@ import net.minecraft.world.entity.MobCategory;
 import turnute.mcprehistoria.MinecraftPrehistoria;
 import turnute.mcprehistoria.entity.aquatic.GiantSquidEntity;
 import turnute.mcprehistoria.entity.insect.MegameliEntity;
+import turnute.mcprehistoria.entity.dino.OdontheriumEntity;
 /**
  * Register all EntityType objects here.
  *
@@ -34,6 +35,13 @@ public final class ModEntities {
 			"megameli",
 			EntityType.Builder.of(MegameliEntity::new, MobCategory.CREATURE)
 					.sized(1.4f, 1.0f)
+					.clientTrackingRange(10)
+	);
+
+	public static final EntityType<OdontheriumEntity> ODONTHERIUM = register(
+			"odontherium",
+			EntityType.Builder.of(OdontheriumEntity::new, MobCategory.MONSTER)
+					.sized(1.25f, 1.35f)
 					.clientTrackingRange(10)
 	);
 
@@ -64,6 +72,11 @@ public final class ModEntities {
 		FabricDefaultAttributeRegistry.register(
 				MEGAMELI,
 				MegameliEntity.createAttributes()
+		);
+
+		FabricDefaultAttributeRegistry.register(
+				ODONTHERIUM,
+				OdontheriumEntity.createAttributes()
 		);
 	}
 }

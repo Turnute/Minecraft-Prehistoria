@@ -39,6 +39,7 @@ public final class ModCreativeTabs {
                 // Spawn Eggs
                 output.accept(ModItems.GIANT_SQUID_SPAWN_EGG);
                 output.accept(ModItems.MEGAMELI_SPAWN_EGG);
+                output.accept(ModItems.ODONTHERIUM_SPAWN_EGG);
 
                 // !!! ADD BLOCK & ITEMS HERE !!!
                 // ========================

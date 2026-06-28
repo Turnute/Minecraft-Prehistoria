@@ -12,5 +12,6 @@ public class MinecraftPrehistoriaClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		EntityRenderers.register(ModEntities.GIANT_SQUID, GiantSquidRenderer::new);
 		EntityRenderers.register(ModEntities.MEGAMELI, context -> new GeoEntityRenderer<>(context, ModEntities.MEGAMELI));
+		EntityRenderers.register(ModEntities.ODONTHERIUM, context -> new GeoEntityRenderer<>(context, ModEntities.ODONTHERIUM));
 	}
 }
