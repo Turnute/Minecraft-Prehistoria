@@ -35,6 +35,7 @@ public final class ModCreativeTabs {
 
                 // Hatchable Eggs
                 output.accept(ModBlocks.MEGAMELI_EGG);
+                output.accept(ModBlocks.ODONTHERIUM_EGG);
 
                 // Spawn Eggs
                 output.accept(ModItems.GIANT_SQUID_SPAWN_EGG);

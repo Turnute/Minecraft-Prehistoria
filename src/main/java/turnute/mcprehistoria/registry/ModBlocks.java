@@ -55,6 +55,17 @@ public final class ModBlocks {
 			true
 	);
 
+	public static final Block ODONTHERIUM_EGG = register(
+			"odontherium_egg",
+			properties -> new HatchingEggBlock(ModEntities.ODONTHERIUM, properties),
+			BlockBehaviour.Properties.of()
+					.strength(0.5F)
+					.sound(SoundType.DRIED_GHAST)
+					.randomTicks()
+					.noOcclusion(),
+			true
+	);
+
 	private static Block register(String name, Function<BlockBehaviour.Properties, Block> blockFactory, BlockBehaviour.Properties properties, boolean shouldRegisterItem) {
 		ResourceKey<Block> blockKey = ResourceKey.create(Registries.BLOCK, MinecraftPrehistoria.id(name));
 		Block block = blockFactory.apply(properties.setId(blockKey));
