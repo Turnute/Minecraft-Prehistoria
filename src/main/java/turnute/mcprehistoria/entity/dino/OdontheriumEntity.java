@@ -67,8 +67,33 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
         this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.25D, true));
         this.goalSelector.addGoal(4, new FollowOwnerGoal(this, 1.15D, 10.0F, 2.0F));
         this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F) {
+            @Override
+            public boolean canUse() {
+                return !OdontheriumEntity.this.isOdontheriumSleeping()
+                        && super.canUse();
+            }
+
+            @Override
+            public boolean canContinueToUse() {
+                return !OdontheriumEntity.this.isOdontheriumSleeping()
+                        && super.canContinueToUse();
+            }
+        });
+
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this) {
+            @Override
+            public boolean canUse() {
+                return !OdontheriumEntity.this.isOdontheriumSleeping()
+                        && super.canUse();
+            }
+
+            @Override
+            public boolean canContinueToUse() {
+                return !OdontheriumEntity.this.isOdontheriumSleeping()
+                        && super.canContinueToUse();
+            }
+        });
 
         this.targetSelector.addGoal(1, new OwnerHurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new OwnerHurtTargetGoal(this));
@@ -142,6 +167,8 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
             this.setTarget(null);
             this.setOrderedToSit(true);
             this.setInSittingPose(true);
+            this.setTarget(null);
+            this.setAggressive(false);
             this.level().broadcastEntityEvent(this, (byte) 7);
             this.playSound(wolfAmbient(WolfSoundVariants.SoundSet.BIG), 1.0F, 1.2F);
         } else {
@@ -180,7 +207,7 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
         controllers.add(new AnimationController<>(state -> {
             boolean sitting = this.isInSittingPose();
 
-            if (sitting && this.level().isDarkOutside()) {
+            if (this.isOdontheriumSleeping()) {
                 return state.setAndContinue(SLEEP_ANIMATION);
             }
 
@@ -212,5 +239,20 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
                 && level.getBlockState(pos.above()).isAir()
                 && level.getFluidState(pos).isEmpty()
                 && random.nextInt(6) == 0;
+    }
+
+    @Override
+    public void aiStep() {
+        super.aiStep();
+
+        if (!this.level().isClientSide()) {
+            LivingEntity target = this.getTarget();
+
+            this.setAggressive(!this.isTame() && target instanceof Player);
+        }
+    }
+
+    private boolean isOdontheriumSleeping() {
+        return this.isInSittingPose() && this.level().isDarkOutside();
     }
 }

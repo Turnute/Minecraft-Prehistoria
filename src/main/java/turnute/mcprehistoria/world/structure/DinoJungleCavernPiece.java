@@ -150,6 +150,10 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 if(hashRange(x, floorY, z, 902, 1400) == 0) {
                     spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.MEGAMELI, 903);
                 }
+
+                if(hashRange(x, floorY, z, 902, 1600) == 0) {
+                    spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.ODONTHERIUM, 900);
+                }
             }
         }
     }
