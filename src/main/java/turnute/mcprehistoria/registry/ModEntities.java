@@ -12,6 +12,7 @@ import turnute.mcprehistoria.MinecraftPrehistoria;
 import turnute.mcprehistoria.entity.aquatic.GiantSquidEntity;
 import turnute.mcprehistoria.entity.insect.MegameliEntity;
 import turnute.mcprehistoria.entity.dino.OdontheriumEntity;
+import turnute.mcprehistoria.entity.dino.EkriktikosaurusEntity;
 /**
  * Register all EntityType objects here.
  *
@@ -42,6 +43,13 @@ public final class ModEntities {
 			"odontherium",
 			EntityType.Builder.of(OdontheriumEntity::new, MobCategory.MONSTER)
 					.sized(1.25f, 1.35f)
+					.clientTrackingRange(10)
+	);
+
+	public static final EntityType<EkriktikosaurusEntity> EKRIKTIKOSAURUS = register(
+			"ekriktikosaurus",
+			EntityType.Builder.of(EkriktikosaurusEntity::new, MobCategory.MONSTER)
+					.sized(1.25f, 2.25f)
 					.clientTrackingRange(10)
 	);
 
@@ -77,6 +85,11 @@ public final class ModEntities {
 		FabricDefaultAttributeRegistry.register(
 				ODONTHERIUM,
 				OdontheriumEntity.createAttributes()
+		);
+
+		FabricDefaultAttributeRegistry.register(
+				EKRIKTIKOSAURUS,
+				EkriktikosaurusEntity.createAttributes()
 		);
 	}
 }

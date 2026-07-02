@@ -30,6 +30,9 @@ import turnute.mcprehistoria.block.BlueMushroomBlock;
 import turnute.mcprehistoria.registry.ModBlocks;
 import turnute.mcprehistoria.registry.ModEntities;
 import turnute.mcprehistoria.world.biome.ModBiomes;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BrushableBlockEntity;
+import turnute.mcprehistoria.registry.ModLoot;
 
 public class DinoJungleCavernPiece extends StructurePiece {
     private static final int SHELL_PADDING = 6;
@@ -120,6 +123,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
         buildEntranceLake(level, chunkBounds);
         buildSingleShaft(level, chunkBounds);
         decorateCavern(level, chunkBounds);
+        placeArchaeologyPatches(level, chunkBounds);
         spawnInitialCavernMobs(level, chunkBounds);
     }
 
@@ -152,7 +156,11 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 }
 
                 if(hashRange(x, floorY, z, 902, 1600) == 0) {
-                    spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.ODONTHERIUM, 900);
+                    spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.ODONTHERIUM, 902);
+                }
+
+                if(hashRange(x, floorY, z, 902, 2400) == 0) {
+                    spawnCavernMob(level, chunkBounds, spawnPos, ModEntities.EKRIKTIKOSAURUS, 902);
                 }
             }
         }
@@ -957,5 +965,131 @@ public class DinoJungleCavernPiece extends StructurePiece {
         int minZ = Math.min(center.getZ() - radiusZ - SHELL_PADDING, entrance.getZ() - SHAFT_WALL_RADIUS - 1);
         int maxZ = Math.max(center.getZ() + radiusZ + SHELL_PADDING, entrance.getZ() + SHAFT_WALL_RADIUS + 1);
         return new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    private void placeArchaeologyPatches(WorldGenLevel level, BoundingBox chunkBounds) {
+        int minX = Math.max(this.boundingBox.minX(), chunkBounds.minX());
+        int maxX = Math.min(this.boundingBox.maxX(), chunkBounds.maxX());
+        int minZ = Math.max(this.boundingBox.minZ(), chunkBounds.minZ());
+        int maxZ = Math.min(this.boundingBox.maxZ(), chunkBounds.maxZ());
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                if (horizontalDistance(x, z) > 0.78D || isLakeColumn(x, z) || isShaftColumn(x, z)) {
+                    continue;
+                }
+
+                int floorY = floorY(x, z);
+
+                // Plus petit = plus fréquent.
+                // Ici, sur une grande caverne, ça donne quelques patches.
+                if (hashRange(x, floorY, z, 960, 950) != 0) {
+                    continue;
+                }
+
+                placeArchaeologyPatch(level, chunkBounds, x, floorY, z);
+            }
+        }
+    }
+
+    private void placeArchaeologyPatch(
+            WorldGenLevel level,
+            BoundingBox chunkBounds,
+            int centerX,
+            int centerY,
+            int centerZ
+    ) {
+        int radius = 1 + hashRange(centerX, centerY, centerZ, 961, 2);
+        boolean gravelPatch = hashRange(centerX, centerY, centerZ, 962, 2) == 0;
+
+        BlockState normalState = gravelPatch
+                ? Blocks.GRAVEL.defaultBlockState()
+                : Blocks.SAND.defaultBlockState();
+
+        BlockState suspiciousState = gravelPatch
+                ? Blocks.SUSPICIOUS_GRAVEL.defaultBlockState()
+                : Blocks.SUSPICIOUS_SAND.defaultBlockState();
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                int distSq = dx * dx + dz * dz;
+                if (distSq > radius * radius) {
+                    continue;
+                }
+
+                int x = centerX + dx;
+                int z = centerZ + dz;
+                int y = floorY(x, z);
+
+                // Évite les patches qui montent/descendent trop sur une pente.
+                if (Math.abs(y - centerY) > 1) {
+                    continue;
+                }
+
+                BlockPos pos = new BlockPos(x, y, z);
+
+                if (!canPlaceArchaeologyBlock(level, chunkBounds, pos)) {
+                    continue;
+                }
+
+                boolean suspicious = distSq == 0 || hashRange(x, y, z, 963, 100) < 30;
+
+                if (suspicious) {
+                    placeSuspiciousArchaeologyBlock(level, pos, suspiciousState, x, y, z);
+                } else {
+                    level.setBlock(pos, normalState, 2);
+                }
+            }
+        }
+    }
+
+    private boolean canPlaceArchaeologyBlock(WorldGenLevel level, BoundingBox chunkBounds, BlockPos pos) {
+        BlockPos above = pos.above();
+        BlockPos below = pos.below();
+
+        return chunkBounds.isInside(pos)
+                && chunkBounds.isInside(above)
+                && !level.isOutsideBuildHeight(pos)
+                && !level.isOutsideBuildHeight(above)
+                && canReplaceWithArchaeology(level.getBlockState(pos))
+                && level.getBlockState(above).isAir()
+                && level.getFluidState(pos).isEmpty()
+                && level.getFluidState(above).isEmpty()
+                && !level.getBlockState(below).isAir()
+                && level.getFluidState(below).isEmpty();
+    }
+
+    private void placeSuspiciousArchaeologyBlock(
+            WorldGenLevel level,
+            BlockPos pos,
+            BlockState suspiciousState,
+            int x,
+            int y,
+            int z
+    ) {
+        level.setBlock(pos, suspiciousState, 2);
+
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof BrushableBlockEntity brushable) {
+            brushable.setLootTable(ModLoot.DINO_JUNGLE_CAVERN_ARCHAEOLOGY, archaeologyLootSeed(x, y, z));
+            blockEntity.setChanged();
+        }
+    }
+
+    private static boolean canReplaceWithArchaeology(BlockState state) {
+        return state.is(Blocks.GRASS_BLOCK)
+                || state.is(Blocks.MOSS_BLOCK)
+                || state.is(Blocks.MUD)
+                || state.is(Blocks.ROOTED_DIRT)
+                || state.is(Blocks.COARSE_DIRT)
+                || state.is(Blocks.DIRT)
+                || state.is(Blocks.PODZOL)
+                || state.is(Blocks.SAND)
+                || state.is(Blocks.GRAVEL);
+    }
+
+    private static long archaeologyLootSeed(int x, int y, int z) {
+        return ((long) hash(x, y, z, 970) << 32)
+                ^ Integer.toUnsignedLong(hash(x, y, z, 971));
     }
 }

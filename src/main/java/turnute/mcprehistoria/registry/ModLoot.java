@@ -28,6 +28,11 @@ public final class ModLoot {
 			Identifier.fromNamespaceAndPath("minecraft", "gameplay/sniffer_digging")
 	);
 
+	public static final ResourceKey<LootTable> DINO_JUNGLE_CAVERN_ARCHAEOLOGY = ResourceKey.create(
+			Registries.LOOT_TABLE,
+			MinecraftPrehistoria.id("archaeology/dino_jungle_cavern")
+	);
+
 	public static void register() {
 		MinecraftPrehistoria.LOGGER.info("Registering loot hooks for {}", MinecraftPrehistoria.MOD_NAME);
 

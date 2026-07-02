@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import turnute.mcprehistoria.MinecraftPrehistoria;
 import turnute.mcprehistoria.entity.aquatic.GiantSquidEntity;
+import turnute.mcprehistoria.entity.dino.EkriktikosaurusEntity;
 import turnute.mcprehistoria.entity.dino.OdontheriumEntity;
 import turnute.mcprehistoria.entity.insect.MegameliEntity;
 import turnute.mcprehistoria.registry.ModEntities;
@@ -61,6 +62,22 @@ public class ModEntitySpawns {
                 12,
                 1,
                 2
+        );
+
+        BiomeModifications.addSpawn(
+                BiomeSelectors.includeByKey(ModBiomes.DINO_JUNGLE),
+                MobCategory.MONSTER,
+                ModEntities.EKRIKTIKOSAURUS,
+                8,
+                1,
+                1
+        );
+
+        registerSpawnPlacementSafely(
+                ModEntities.EKRIKTIKOSAURUS,
+                SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                ModEntitySpawns::canEkriktikosaurusSpawn
         );
 
         registerSpawnPlacementSafely(
@@ -142,6 +159,17 @@ public class ModEntitySpawns {
                 && level.getBlockState(pos.above()).isAir()
                 && level.getFluidState(pos).isEmpty()
                 && random.nextInt(6) == 0;
+    }
+
+    private static boolean canEkriktikosaurusSpawn(
+            EntityType<EkriktikosaurusEntity> entityType,
+            ServerLevelAccessor level,
+            EntitySpawnReason spawnReason,
+            BlockPos pos,
+            net.minecraft.util.RandomSource random
+    ) {
+        return isDinoJungle(level, pos)
+                && EkriktikosaurusEntity.canSpawn(entityType, level, spawnReason, pos, random);
     }
 
     private static boolean isDinoFloor(BlockState state) {

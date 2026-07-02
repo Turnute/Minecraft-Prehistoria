@@ -4,9 +4,9 @@
     "particle": "minecraft-prehistoria:block/excavation_table_top",
     "down": "minecraft-prehistoria:block/excavation_table_bottom",
     "up": "minecraft-prehistoria:block/excavation_table_top",
-    "north": "minecraft-prehistoria:block/excavation_table_north",
-    "south": "minecraft-prehistoria:block/excavation_table_south",
-    "east": "minecraft-prehistoria:block/excavation_table_east",
-    "west": "minecraft-prehistoria:block/excavation_table_west"
+    "north": "minecraft-prehistoria:block/excavation_table_side1",
+    "south": "minecraft-prehistoria:block/excavation_table_side1",
+    "east": "minecraft-prehistoria:block/excavation_table_side2",
+    "west": "minecraft-prehistoria:block/excavation_table_side2"
   }
 }

@@ -39,6 +39,12 @@ public final class ModItems {
 			new Item.Properties().spawnEgg(ModEntities.ODONTHERIUM)
 	);
 
+	public static final Item EKRIKTIKOSAURUS_SPAWN_EGG = register(
+			"ekriktikosaurus_spawn_egg",
+			SpawnEggItem::new,
+			new Item.Properties().spawnEgg(ModEntities.EKRIKTIKOSAURUS)
+	);
+
 	public static final Item ANCIENT_BONE = register(
 			"ancient_bone",
 			Item::new,

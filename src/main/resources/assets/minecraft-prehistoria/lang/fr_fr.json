@@ -14,5 +14,18 @@
   "block.minecraft-prehistoria.megameli_egg": "Œuf de Megameli",
   "block.minecraft-prehistoria.odontherium_egg": "Œuf d'Odontherium",
   "entity.minecraft-prehistoria.odontherium": "Odontherium",
-  "item.minecraft-prehistoria.odontherium_spawn_egg": "Œuf d'apparition d'Odontherium"
+  "item.minecraft-prehistoria.odontherium_spawn_egg": "Œuf d'apparition d'Odontherium",
+  "entity.minecraft-prehistoria.ekriktikosaurus": "Ekriktikosaurus",
+  "item.minecraft-prehistoria.ekriktikosaurus_spawn_egg": "Œuf d'apparition d'Ekriktikosaurus",
+  "message.minecraft-prehistoria.excavation_table.empty": "La table de fouille a besoin d'un objet à examiner !",
+  "message.minecraft-prehistoria.excavation_table.default": "Il n'y a rien de notable à dire sur cet objet...",
+  "excavation.minecraft-prehistoria.excavation_table": "Table de fouille : un établi d'archéologue utilisé pour identifier reliques, fossiles, œufs et spécimens préhistoriques.",
+  "excavation.minecraft-prehistoria.blue_mushroom": "Champignon bleu : un champignon lumineux venu d'une caverne préhistorique isolée. Sa lueur suffit à éclairer un chantier de fouille.",
+  "excavation.minecraft-prehistoria.ancient_bone": "Os ancien : un reste fossilisé provenant d'une créature trop vieille pour l'histoire ordinaire. Les archéologues peuvent s'y intéresser.",
+  "excavation.minecraft-prehistoria.megameli_egg": "Œuf de Megameli : un fragile œuf d'insecte préhistorique. Pose-le et laisse-lui le temps d'éclore en Megameli.",
+  "excavation.minecraft-prehistoria.odontherium_egg": "Œuf d'Odontherium : un œuf dense de bête mammalienne. Pose-le prudemment et laisse-lui le temps d'éclore.",
+  "excavation.minecraft-prehistoria.giant_squid_spawn_egg": "Œuf d'apparition de calmar géant : libère un calmar géant, survivant des profondeurs anciennes.",
+  "excavation.minecraft-prehistoria.megameli_spawn_egg": "Œuf d'apparition de Megameli : libère un Megameli, insecte préhistorique géant.",
+  "excavation.minecraft-prehistoria.odontherium_spawn_egg": "Œuf d'apparition d'Odontherium : libère un Odontherium, menace préhistorique massive.",
+  "excavation.minecraft-prehistoria.ekriktikosaurus_spawn_egg": "Œuf d'apparition d'Ekriktikosaurus : libère un Ekriktikosaurus, prédateur immense qui charge avant d'exploser violemment."
 }

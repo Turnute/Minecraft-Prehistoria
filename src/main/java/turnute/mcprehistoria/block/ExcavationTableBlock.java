@@ -24,7 +24,7 @@ public class ExcavationTableBlock extends Block {
         }
 
         if(stack.isEmpty()) {
-            player.sendSystemMessage(Component.literal("The excavation table needs an object to examine!"));
+            player.sendSystemMessage(Component.translatable("message.minecraft-prehistoria.excavation_table.empty"));
             return InteractionResult.SUCCESS;
         }
 

@@ -14,5 +14,18 @@
   "block.minecraft-prehistoria.megameli_egg": "Megameli Egg",
   "block.minecraft-prehistoria.odontherium_egg": "Odontherium Egg",
   "entity.minecraft-prehistoria.odontherium": "Odontherium",
-  "item.minecraft-prehistoria.odontherium_spawn_egg": "Odontherium Spawn Egg"
+  "item.minecraft-prehistoria.odontherium_spawn_egg": "Odontherium Spawn Egg",
+  "entity.minecraft-prehistoria.ekriktikosaurus": "Ekriktikosaurus",
+  "item.minecraft-prehistoria.ekriktikosaurus_spawn_egg": "Ekriktikosaurus Spawn Egg",
+  "message.minecraft-prehistoria.excavation_table.empty": "The excavation table needs an object to examine!",
+  "message.minecraft-prehistoria.excavation_table.default": "There's nothing of note about this item...",
+  "excavation.minecraft-prehistoria.excavation_table": "Excavation Table: An archaeologist's workbench used to identify relics, fossils, eggs, and prehistoric specimens.",
+  "excavation.minecraft-prehistoria.blue_mushroom": "Blue Mushroom: A luminous fungus from a sealed prehistoric cavern. Its glow is bright enough to light a dig site.",
+  "excavation.minecraft-prehistoria.ancient_bone": "Ancient Bone: A fossilized remain from a creature too old for ordinary history. Archaeologists may trade for it.",
+  "excavation.minecraft-prehistoria.megameli_egg": "Megameli Egg: A fragile prehistoric insect egg. Place it down and give it time to hatch into a Megameli.",
+  "excavation.minecraft-prehistoria.odontherium_egg": "Odontherium Egg: A dense mammal-like beast egg. Place it carefully and give it time to hatch.",
+  "excavation.minecraft-prehistoria.giant_squid_spawn_egg": "Giant Squid Spawn Egg: Releases a giant squid, a deep-ocean survivor from ancient waters.",
+  "excavation.minecraft-prehistoria.megameli_spawn_egg": "Megameli Spawn Egg: Releases a Megameli, a giant prehistoric insect.",
+  "excavation.minecraft-prehistoria.odontherium_spawn_egg": "Odontherium Spawn Egg: Releases an Odontherium, a heavy prehistoric threat.",
+  "excavation.minecraft-prehistoria.ekriktikosaurus_spawn_egg": "Ekriktikosaurus Spawn Egg: Releases an Ekriktikosaurus, a towering predator that charges before bursting with explosive force."
 }

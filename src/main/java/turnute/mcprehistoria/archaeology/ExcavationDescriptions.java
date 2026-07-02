@@ -5,32 +5,51 @@ import java.util.Map;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import turnute.mcprehistoria.registry.ModItems;
 import turnute.mcprehistoria.registry.ModBlocks;
+import turnute.mcprehistoria.registry.ModItems;
 
-public class ExcavationDescriptions {
+/**
+ * Small, hardcoded archaeology codex used by the excavation table.
+ *
+ * The table stays deliberately simple for the jam: it reads the item held by the
+ * player and returns a short translated description when the object belongs to
+ * the mod.
+ */
+public final class ExcavationDescriptions {
     private ExcavationDescriptions() {}
 
     private static final Map<Item, Component> DESCRIPTIONS = new HashMap<>();
 
     public static void register() {
         // Blocks
-        DESCRIPTIONS.put(ModBlocks.EXCAVATION_TABLE.asItem(), Component.literal("Excavation Table: Used for examining Minecraft Prehistorica mod items and blocks."));
+        add(ModBlocks.EXCAVATION_TABLE.asItem(), "excavation_table");
+        add(ModBlocks.BLUE_MUSHROOM.asItem(), "blue_mushroom");
 
-        // Items & Plants
-        DESCRIPTIONS.put(ModItems.ANCIENT_BONE, Component.literal("Ancient Bone: TODO"));
-        DESCRIPTIONS.put(ModBlocks.BLUE_MUSHROOM.asItem(), Component.literal("Blue Mushroom: An ancient species of mushrooms that survived in a remote place. Emits a bright natural light."));
+        // Fossils and finds
+        add(ModItems.ANCIENT_BONE, "ancient_bone");
 
-        // Hatchable Eggs
-        DESCRIPTIONS.put(ModBlocks.MEGAMELI_EGG.asItem(), Component.literal("Megameli Egg: TODO"));
+        // Hatchable eggs
+        add(ModBlocks.MEGAMELI_EGG.asItem(), "megameli_egg");
+        add(ModBlocks.ODONTHERIUM_EGG.asItem(), "odontherium_egg");
 
-        // Spawn Eggs
-        DESCRIPTIONS.put(ModItems.MEGAMELI_SPAWN_EGG, Component.literal("Megameli Spawn Egg: Spawns a Megameli Entity."));
-        DESCRIPTIONS.put(ModItems.GIANT_SQUID_SPAWN_EGG, Component.literal("Giant Squid Spawn Egg: Spawns a Giant Squid Entity."));
+        // Spawn eggs
+        add(ModItems.GIANT_SQUID_SPAWN_EGG, "giant_squid_spawn_egg");
+        add(ModItems.MEGAMELI_SPAWN_EGG, "megameli_spawn_egg");
+        add(ModItems.ODONTHERIUM_SPAWN_EGG, "odontherium_spawn_egg");
+        add(ModItems.EKRIKTIKOSAURUS_SPAWN_EGG, "ekriktikosaurus_spawn_egg");
+    }
 
+    private static void add(Item item, String descriptionKey) {
+        DESCRIPTIONS.put(
+                item,
+                Component.translatable("excavation.minecraft-prehistoria." + descriptionKey)
+        );
     }
 
     public static Component getDescription(final Item item) {
-        return DESCRIPTIONS.getOrDefault(item, Component.literal("There's nothing of note to this item..."));
+        return DESCRIPTIONS.getOrDefault(
+                item,
+                Component.translatable("message.minecraft-prehistoria.excavation_table.default")
+        );
     }
 }

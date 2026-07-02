@@ -1,0 +1,46 @@
+{
+  "type": "minecraft:archaeology",
+  "random_sequence": "minecraft-prehistoria:archaeology/dino_jungle_cavern",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft-prehistoria:ancient_bone",
+          "weight": 45,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft-prehistoria:megameli_egg",
+          "weight": 18
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft-prehistoria:odontherium_egg",
+          "weight": 18
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:torchflower_seeds",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:pitcher_pod",
+          "weight": 9
+        }
+      ]
+    }
+  ]
+}
