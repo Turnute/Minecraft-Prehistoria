@@ -1,0 +1,15 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 30.0
+  },
+  "additional_wants": {
+    "id": "minecraft-prehistoria:ancient_bone"
+  },
+  "gives": {
+    "id": "minecraft:sniffer_egg"
+  },
+  "max_uses": 1.0,
+  "reputation_discount": 0.15,
+  "xp": 24.0
+}

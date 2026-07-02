@@ -1,6 +1,8 @@
 {
   "values": [
-    "minecraft-prehistoria:archaeologist/2/emerald_skull_pottery_sherd",
-    "minecraft-prehistoria:archaeologist/2/emerald_snort_pottery_sherd"
+    "minecraft-prehistoria:archaeologist/5/emerald_and_ancient_bone_megameli_spawn_egg",
+    "minecraft-prehistoria:archaeologist/5/emerald_and_ancient_bone_odontherium_spawn_egg",
+    "minecraft-prehistoria:archaeologist/5/emerald_and_ancient_bone_giant_squid_spawn_egg",
+    "minecraft-prehistoria:archaeologist/5/emerald_and_ancient_bone_ekriktikosaurus_spawn_egg"
   ]
 }

@@ -1,7 +1,8 @@
 {
   "values": [
+    "minecraft-prehistoria:archaeologist/2/emerald_suspicious_sand",
+    "minecraft-prehistoria:archaeologist/2/emerald_suspicious_gravel",
     "minecraft-prehistoria:archaeologist/2/emerald_skull_pottery_sherd",
-    "minecraft-prehistoria:archaeologist/2/emerald_snort_pottery_sherd",
-    "minecraft-prehistoria:archaeologist/2/emerald_suspicious_sand"
+    "minecraft-prehistoria:archaeologist/2/emerald_snort_pottery_sherd"
   ]
 }

@@ -1,0 +1,12 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 8.0
+  },
+  "gives": {
+    "id": "minecraft-prehistoria:excavation_table"
+  },
+  "max_uses": 6.0,
+  "reputation_discount": 0.08,
+  "xp": 8.0
+}

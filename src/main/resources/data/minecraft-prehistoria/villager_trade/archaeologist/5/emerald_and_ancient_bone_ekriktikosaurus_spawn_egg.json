@@ -1,0 +1,16 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 56.0
+  },
+  "additional_wants": {
+    "id": "minecraft-prehistoria:ancient_bone",
+    "count": 4.0
+  },
+  "gives": {
+    "id": "minecraft-prehistoria:ekriktikosaurus_spawn_egg"
+  },
+  "max_uses": 1.0,
+  "reputation_discount": 0.2,
+  "xp": 35.0
+}

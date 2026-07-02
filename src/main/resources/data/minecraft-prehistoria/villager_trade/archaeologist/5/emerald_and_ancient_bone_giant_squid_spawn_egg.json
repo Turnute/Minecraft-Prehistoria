@@ -1,0 +1,16 @@
+{
+  "wants": {
+    "id": "minecraft:emerald",
+    "count": 46.0
+  },
+  "additional_wants": {
+    "id": "minecraft-prehistoria:ancient_bone",
+    "count": 3.0
+  },
+  "gives": {
+    "id": "minecraft-prehistoria:giant_squid_spawn_egg"
+  },
+  "max_uses": 1.0,
+  "reputation_discount": 0.2,
+  "xp": 30.0
+}
