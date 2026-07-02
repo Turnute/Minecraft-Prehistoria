@@ -32,6 +32,11 @@
         },
         {
           "type": "minecraft:item",
+          "name": "minecraft:sniffer_egg",
+          "weight": 22
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:torchflower_seeds",
           "weight": 10
         },

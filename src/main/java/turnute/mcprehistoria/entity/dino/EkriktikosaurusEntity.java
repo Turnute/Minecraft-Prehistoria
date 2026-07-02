@@ -6,6 +6,7 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
+import net.fabricmc.fabric.api.client.message.v1.ClientSendMessageEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -33,6 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.EnumSet;
 
@@ -68,6 +70,10 @@ public class EkriktikosaurusEntity extends Monster implements GeoEntity {
 
     // Vitesse de poursuite. Il continue d'avancer même pendant la charge.
     private static final double CHASE_SPEED = 1.15D;
+
+    private static final float SELF_EXPLOSION_DAMAGE = 4.0F;
+    private static final double SELF_EXPLOSION_RECOIL_HORIZONTAL = 0.9D;
+    private static final double SELF_EXPLOSION_RECOIL_VERTICAL = 0.35D;
 
     private int swellTicks;
     private int explosionCooldown;
@@ -189,15 +195,15 @@ public class EkriktikosaurusEntity extends Monster implements GeoEntity {
     }
 
     private void explodeWithoutDying() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
         this.swellTicks = 0;
         this.setSwelling(false);
         this.explosionCooldown = POST_EXPLOSION_COOLDOWN_TICKS;
 
-        float healthBeforeExplosion = this.getHealth();
-        boolean wasInvulnerable = this.isInvulnerable();
-
-        // Sécurité : il ne doit jamais mourir de sa propre explosion.
-        this.setInvulnerable(true);
+        this.getNavigation().stop();
 
         this.level().explode(
                 this,
@@ -209,11 +215,54 @@ public class EkriktikosaurusEntity extends Monster implements GeoEntity {
                 Level.ExplosionInteraction.NONE
         );
 
-        this.setInvulnerable(wasInvulnerable);
+        hurtSelfFromOwnExplosion(serverLevel);
+        recoilFromOwnExplosion();
+    }
 
-        if (this.isAlive() && this.getHealth() < healthBeforeExplosion) {
-            this.setHealth(healthBeforeExplosion);
+    private void hurtSelfFromOwnExplosion(ServerLevel serverLevel) {
+        float damage = SELF_EXPLOSION_DAMAGE;
+
+        if (damage <= 0.0F) {
+            return;
         }
+
+        // Évite que l'invulnerability window bloque le contrecoup.
+        this.invulnerableTime = 0;
+
+        DamageSource selfExplosionDamage = this.damageSources().explosion(this, this);
+        this.hurtServer(serverLevel, selfExplosionDamage, damage);
+    }
+
+    private void recoilFromOwnExplosion() {
+        Vec3 direction = Vec3.ZERO;
+
+        LivingEntity target = this.getTarget();
+
+        if (target != null) {
+            // Recul à l'opposé de la cible.
+            direction = this.position().subtract(target.position());
+        }
+
+        direction = new Vec3(direction.x, 0.0D, direction.z);
+
+        if (direction.lengthSqr() < 1.0E-4D) {
+            // Fallback : s'il n'a pas de cible ou qu'il est pile au même point,
+            // on le repousse dans le sens inverse de son regard.
+            Vec3 look = this.getLookAngle();
+            direction = new Vec3(-look.x, 0.0D, -look.z);
+        }
+
+        if (direction.lengthSqr() < 1.0E-4D) {
+            direction = new Vec3(0.0D, 0.0D, 1.0D);
+        }
+
+        direction = direction.normalize();
+
+        this.push(
+                direction.x * SELF_EXPLOSION_RECOIL_HORIZONTAL,
+                SELF_EXPLOSION_RECOIL_VERTICAL,
+                direction.z * SELF_EXPLOSION_RECOIL_HORIZONTAL
+        );
     }
 
     @Override

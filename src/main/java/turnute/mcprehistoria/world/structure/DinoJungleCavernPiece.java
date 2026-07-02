@@ -122,8 +122,8 @@ public class DinoJungleCavernPiece extends StructurePiece {
         buildOverworldSliceCavern(level, chunkBounds);
         buildEntranceLake(level, chunkBounds);
         buildSingleShaft(level, chunkBounds);
-        decorateCavern(level, chunkBounds);
         placeArchaeologyPatches(level, chunkBounds);
+        decorateCavern(level, chunkBounds);
         spawnInitialCavernMobs(level, chunkBounds);
     }
 
@@ -968,28 +968,54 @@ public class DinoJungleCavernPiece extends StructurePiece {
     }
 
     private void placeArchaeologyPatches(WorldGenLevel level, BoundingBox chunkBounds) {
-        int minX = Math.max(this.boundingBox.minX(), chunkBounds.minX());
-        int maxX = Math.min(this.boundingBox.maxX(), chunkBounds.maxX());
-        int minZ = Math.max(this.boundingBox.minZ(), chunkBounds.minZ());
-        int maxZ = Math.min(this.boundingBox.maxZ(), chunkBounds.maxZ());
+        BlockPos patchCenter = archaeologyPatchCenter();
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                if (horizontalDistance(x, z) > 0.78D || isLakeColumn(x, z) || isShaftColumn(x, z)) {
-                    continue;
-                }
+        int radius = 5 + hashRange(
+                patchCenter.getX(),
+                patchCenter.getY(),
+                patchCenter.getZ(),
+                961,
+                2
+        ); // 5 ou 6 blocs de rayon
 
-                int floorY = floorY(x, z);
+        boolean gravelPatch = hashRange(
+                patchCenter.getX(),
+                patchCenter.getY(),
+                patchCenter.getZ(),
+                962,
+                2
+        ) == 0;
 
-                // Plus petit = plus fréquent.
-                // Ici, sur une grande caverne, ça donne quelques patches.
-                if (hashRange(x, floorY, z, 960, 950) != 0) {
-                    continue;
-                }
+        placeArchaeologyPatch(
+                level,
+                chunkBounds,
+                patchCenter.getX(),
+                patchCenter.getY(),
+                patchCenter.getZ(),
+                radius,
+                gravelPatch
+        );
+    }
 
-                placeArchaeologyPatch(level, chunkBounds, x, floorY, z);
+    private BlockPos archaeologyPatchCenter() {
+        for (int attempt = 0; attempt < 16; attempt++) {
+            double nx = ((hashRange(center.getX(), center.getY(), center.getZ(), 980 + attempt * 2, 2001) - 1000) / 1000.0D) * 0.62D;
+            double nz = ((hashRange(center.getX(), center.getY(), center.getZ(), 981 + attempt * 2, 2001) - 1000) / 1000.0D) * 0.62D;
+
+            int x = center.getX() + (int) Math.round(nx * radiusX);
+            int z = center.getZ() + (int) Math.round(nz * radiusZ);
+
+            if (horizontalDistance(x, z) > 0.68D || isLakeColumn(x, z) || isShaftColumn(x, z)) {
+                continue;
             }
+
+            int y = floorY(x, z);
+            return new BlockPos(x, y, z);
         }
+
+        int fallbackX = center.getX();
+        int fallbackZ = center.getZ();
+        return new BlockPos(fallbackX, floorY(fallbackX, fallbackZ), fallbackZ);
     }
 
     private void placeArchaeologyPatch(
@@ -997,11 +1023,10 @@ public class DinoJungleCavernPiece extends StructurePiece {
             BoundingBox chunkBounds,
             int centerX,
             int centerY,
-            int centerZ
+            int centerZ,
+            int radius,
+            boolean gravelPatch
     ) {
-        int radius = 1 + hashRange(centerX, centerY, centerZ, 961, 2);
-        boolean gravelPatch = hashRange(centerX, centerY, centerZ, 962, 2) == 0;
-
         BlockState normalState = gravelPatch
                 ? Blocks.GRAVEL.defaultBlockState()
                 : Blocks.SAND.defaultBlockState();
@@ -1010,10 +1035,13 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 ? Blocks.SUSPICIOUS_GRAVEL.defaultBlockState()
                 : Blocks.SUSPICIOUS_SAND.defaultBlockState();
 
+        int radiusSq = radius * radius;
+
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 int distSq = dx * dx + dz * dz;
-                if (distSq > radius * radius) {
+
+                if (distSq > radiusSq) {
                     continue;
                 }
 
@@ -1021,8 +1049,7 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 int z = centerZ + dz;
                 int y = floorY(x, z);
 
-                // Évite les patches qui montent/descendent trop sur une pente.
-                if (Math.abs(y - centerY) > 1) {
+                if (Math.abs(y - centerY) > 2) {
                     continue;
                 }
 
@@ -1032,7 +1059,11 @@ public class DinoJungleCavernPiece extends StructurePiece {
                     continue;
                 }
 
-                boolean suspicious = distSq == 0 || hashRange(x, y, z, 963, 100) < 30;
+                double normalizedDistance = (double) distSq / (double) radiusSq;
+
+                boolean suspicious =
+                        normalizedDistance < 0.12D
+                                || hashRange(x, y, z, 963, 100) < suspiciousChance(normalizedDistance);
 
                 if (suspicious) {
                     placeSuspiciousArchaeologyBlock(level, pos, suspiciousState, x, y, z);
@@ -1041,6 +1072,16 @@ public class DinoJungleCavernPiece extends StructurePiece {
                 }
             }
         }
+    }
+
+    private static int suspiciousChance(double normalizedDistance) {
+        if (normalizedDistance < 0.35D) {
+            return 45;
+        }
+        if (normalizedDistance < 0.70D) {
+            return 28;
+        }
+        return 12;
     }
 
     private boolean canPlaceArchaeologyBlock(WorldGenLevel level, BoundingBox chunkBounds, BlockPos pos) {

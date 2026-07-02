@@ -18,13 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.FollowOwnerGoal;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.SitWhenOrderedToGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
@@ -34,6 +28,8 @@ import net.minecraft.world.entity.animal.wolf.WolfSoundVariant;
 import net.minecraft.world.entity.animal.wolf.WolfSoundVariants;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import org.jspecify.annotations.Nullable;
 import turnute.mcprehistoria.registry.ModItems;
@@ -43,6 +39,21 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
     private static final RawAnimation WALK_ANIMATION = RawAnimation.begin().thenLoop("odontherium_walk");
     private static final RawAnimation SIT_ANIMATION = RawAnimation.begin().thenLoop("odontherium_sit");
     private static final RawAnimation SLEEP_ANIMATION = RawAnimation.begin().thenLoop("odontherium_sleep");
+
+    private static final Ingredient TEMPT_FOOD = Ingredient.of(
+            Items.MUTTON,
+            Items.COOKED_MUTTON,
+            Items.BEEF,
+            Items.COOKED_BEEF,
+            Items.CHICKEN,
+            Items.COOKED_CHICKEN,
+            Items.PORKCHOP,
+            Items.COOKED_PORKCHOP,
+            Items.RABBIT,
+            Items.COOKED_RABBIT,
+            Items.RABBIT_FOOT,
+            Items.ROTTEN_FLESH
+    );
 
     private static final int TAMING_CHANCE = 3;
 
@@ -57,17 +68,33 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
                 .add(Attributes.MAX_HEALTH, 36.0D)
                 .add(Attributes.ATTACK_DAMAGE, 7.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.34D)
-                .add(Attributes.FOLLOW_RANGE, 32.0D);
+                .add(Attributes.FOLLOW_RANGE, 32.0D)
+                .add(Attributes.TEMPT_RANGE, 10.0D);
     }
 
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(3, new MeleeAttackGoal(this, 1.25D, true));
-        this.goalSelector.addGoal(4, new FollowOwnerGoal(this, 1.15D, 10.0F, 2.0F));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0F) {
+
+        this.goalSelector.addGoal(3, new TemptGoal(this, 1.15D, TEMPT_FOOD, false) {
+            @Override
+            public boolean canUse() {
+                return !OdontheriumEntity.this.isTame()
+                        && super.canUse();
+            }
+
+            @Override
+            public boolean canContinueToUse() {
+                return !OdontheriumEntity.this.isTame()
+                        && super.canContinueToUse();
+            }
+        });
+
+        this.goalSelector.addGoal(4, new MeleeAttackGoal(this, 1.25D, true));
+        this.goalSelector.addGoal(5, new FollowOwnerGoal(this, 1.15D, 10.0F, 2.0F));
+        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 8.0F) {
             @Override
             public boolean canUse() {
                 return !OdontheriumEntity.this.isOdontheriumSleeping()
@@ -81,7 +108,7 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
             }
         });
 
-        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this) {
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this) {
             @Override
             public boolean canUse() {
                 return !OdontheriumEntity.this.isOdontheriumSleeping()
@@ -179,6 +206,10 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public boolean canAttack(LivingEntity target) {
+        if (!this.isTame() && this.isHoldingTemptFood(target)) {
+            return false;
+        }
+
         if (this.isTame() && this.isOwnedBy(target)) {
             return false;
         }
@@ -193,7 +224,16 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
 
     @Override
     public boolean isFood(ItemStack stack) {
-        return false;
+        return TEMPT_FOOD.test(stack);
+    }
+
+    private boolean isHoldingTemptFood(LivingEntity entity) {
+        if (!(entity instanceof Player player)) {
+            return false;
+        }
+
+        return this.isFood(player.getMainHandItem())
+                || this.isFood(player.getOffhandItem());
     }
 
     @Override
@@ -247,6 +287,13 @@ public class OdontheriumEntity extends TamableAnimal implements GeoEntity {
 
         if (!this.level().isClientSide()) {
             LivingEntity target = this.getTarget();
+
+            if (!this.isTame() && target instanceof Player && this.isHoldingTemptFood(target)) {
+                this.setTarget(null);
+                this.setAggressive(false);
+                this.getNavigation().stop();
+                return;
+            }
 
             this.setAggressive(!this.isTame() && target instanceof Player);
         }
